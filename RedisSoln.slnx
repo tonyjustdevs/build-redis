@@ -1,0 +1,9 @@
+<Solution>
+  <Project Path="TonyRedis2/TonyRedis2.csproj" Id="b789bd55-a22a-42e2-89f8-b4f76bd178db">
+    <Build Solution="Debug|*" Project="false" />
+  </Project>
+  <Project Path="TonyRedis3/TonyRedis3.csproj" Id="aae4117c-04fe-4297-8f22-57bc590ccba5" />
+  <Project Path="TonysRedis/TonysRedis.csproj">
+    <Build Solution="Debug|*" Project="false" />
+  </Project>
+</Solution>
