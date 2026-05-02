@@ -37,3 +37,14 @@ Configuration Manager
 |-|-|-|
 |Native Host Stub|<br>- 1. locate dotnet runtime <br>- 2. load dll<br>- 3. call entry point|`tony.exe` -> loads -> `tony.dll` -> runs `Main()`|
 |Self-Contained `publish`|Includes:<br>- source code<br>- runtime<br>- dependencies|`dotnet publish -r win-x64 --self-contained true`|
+
+### Installing redis official `cli`
+Link: https://redis.io/docs/latest/operate/oss_and_stack/install/install-stack/apt/
+`sudo apt-get install lsb-release curl gpg`
+`curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg`
+`sudo chmod 644 /usr/share/keyrings/redis-archive-keyring.gpg`
+`echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list`
+`sudo apt-get update`
+`sudo apt-get install redis`
+
+Manual: https://redis.io/docs/latest/develop/tools/cli/
