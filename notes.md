@@ -47,4 +47,61 @@ Link: https://redis.io/docs/latest/operate/oss_and_stack/install/install-stack/a
 `sudo apt-get update`
 `sudo apt-get install redis`
 
-Manual: https://redis.io/docs/latest/develop/tools/cli/
+Manual: https://redis.io/docs/latest/develop/tools/cli/ 
+
+### TCP stuff: Wireshark
+World's most popular network protocol analyzer
+
+Precision Configuration
+|Setting|Value|Description|Example|
+|-|-|-|-|
+| Choose Interface|`Standard User`:<br>- `vEthernel (WSL)`|The **virtual interface** that is WSL2's *window* to Windows networking<br>- The ONLY interface carrying WSL2 localhost traffic|-`tcp port 63791`<br>- `host 127.0.01`|
+|Capture Filter<br>- port number| `port 6379`|Reduce noise<br>- only captures Redis port traffic|`tcp.port == 6379 && tcp.flags.syn == 1`|
+|Buffer Size| Default: 2MB|Enough for Redis<br>- prevent drops<br>- Capture filters run in kernel mode - they're CPU-efficient|
+
+
+
+#### 3. Generate Traffic
+```bash
+# Start your Redis server (replace with your actual command)
+./your_redis_server --port 6379
+
+# In a NEW terminal window (don't stop capture!)
+redis-cli PING PING QUIT
+```
+
+Note: `QUIT` command generates a clean TCP teardown (essential for seeing full connection lifecycle).
+
+#### 4. Real-Time Analysis
+1. The `TCP` Handhake
+2. Redis Protocol Dissection
+3. Critical Sequence Numbers:
+- TCP: Seq #
+- Next Seq #
+- Ack #. 
+
+#### 5. Various Techniques
+|Techniques|How to|
+|-|-|
+|1. Follow Conversation|Select Redis package<br>- right-click <br>- follow<br>- tcp stream<br>- to ASCII|
+|2. Find Protocol Errors|`tcp.analysis.retransmission \|\| tcp.analysis.out_of_order \|\| redis`|
+|3. Measure Performance
+
+
+Smoke test:
+- adapter for loopback traffice capture:  loopback adapter (double click)
+- ping 127.0.0.01
+
+# Grok Suggestion 
+|Solution|File|File Edit|
+|-|-|-|
+|[0a] Check whats listening to specific ports |`ss -ltnp \| grep 6379`|Sample output:<br>- `LISTEN 0      511      172.27.49.71:6379       0.0.0.0:*`<br>- `LISTEN 0      511         127.0.0.1:6379       0.0.0.0:*`<br>- `LISTEN 0      511             [::1]:6379          [::]:`|
+|[0b] Check process |`ps aux \| grep redis-server`|Sample output:<br>- `/usr/bin/redis-server 127.0.0.1:6379`|
+|[0b] Check redis server status |`sudo systemctl status redis-server`|Sample output:<br>- `Active: active (running)`|
+| [1] Edit Redis Config| `sudo nano /etc/redis/redis.conf`|[1a] Bind to all interface (or specifically your IP)<br>- `bind 0.0.0.0 ::0` or<br>[1b] Bind only your specific IP:<br>- bind `172.27.49.71`<br>[1c] Both:<br> - `bind 127.0.0.1 ::1 172.27.49.71`<br><br>[3] Disable protected mode (if you're in a trusted network)<br>- `protected-mode no`<br><br>[4] Restart:<br>- `sudo systemctl restart redis-server`<br>- `sudo service redis restart`<br><br>[5] Test again:<br>- `sudo ss -ltnp \| grep 6379` <br>- `redis-cli -h 172.27.49.71 PING`<br><br>[6] Capture traffic in WS:<br>- `ip.addr == 172.27.49.71 && tcp.port == 6379``|
+|[2] Test via `TCP`|`telnet 172.27.49.71 6379`|
+
+
+### TCP from Windows to WSL Redis-Server
+[Powershell] Test-NetConnection 172.27.49.71 -Port 6379:
+- `34	238.506415600	TCP	172.27.48.1	62763	172.27.49.71	6379	66	62763 → 6379 [SYN] Seq=0 Win=65535 Len=0 MSS=1460 WS=256 SACK_PERM	62763	62763	6379	6379	238.506415600	66`
