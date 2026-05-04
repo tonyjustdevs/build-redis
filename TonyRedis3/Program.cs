@@ -10,18 +10,13 @@ namespace TonyRedis3
     {
         static void Main(string[] args)
         {
-            WriteLine("TP Redis Server Starting...");
-            WriteLine($"args length: {args.Length   }");
-            foreach (var arg in args)
-            {
-                Console.WriteLine($"arg: {arg}");
-            }
-            TcpListener server = new TcpListener(System.Net.IPAddress.Any, 6970);
+            Console.WriteLine("TP Redis Server Starting...");
+            Console.WriteLine($"args length: {args.Length   }");
+            TcpListener server = new TcpListener(System.Net.IPAddress.Any, 6379);
             server.Start();
             var client = server.AcceptSocket();
 
-            WriteLine($"client.Connected: {client.Connected}");
-            //WriteLine($"Received bytes: ");
+            Console.WriteLine($"client.Connected: {client.Connected}");
             
             byte[] byte_buffer = new byte[42];
             
@@ -32,21 +27,11 @@ namespace TonyRedis3
                 {
                     break;
                 }
-                //WriteLine($"\ncurrent buffer: ");
-                //foreach (var item in byte_buffer)
-                //{
-                //    Write($"{item} ");
-                //}
-                //WriteLine($"Converted to string: {Encoding.ASCII.GetString(byte_buffer)}");
                 client.Send(Encoding.ASCII.GetBytes("+PONG\r\n"));
-                //client.Send(Encoding.ASCII.GetBytes("+PONG"));
             }
-            WriteLine($"connection ended.\n");
+            Console.WriteLine($"connection ended.\n");
 
-            
-            
-            
-            WriteLine("TP Redis Server Stopped...");
+            Console.WriteLine("TP Redis Server Stopped...");
         }
     }
 }

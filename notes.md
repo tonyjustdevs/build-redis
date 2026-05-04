@@ -105,3 +105,29 @@ Smoke test:
 ### TCP from Windows to WSL Redis-Server
 [Powershell] Test-NetConnection 172.27.49.71 -Port 6379:
 - `34	238.506415600	TCP	172.27.48.1	62763	172.27.49.71	6379	66	62763 → 6379 [SYN] Seq=0 Win=65535 Len=0 MSS=1460 WS=256 SACK_PERM	62763	62763	6379	6379	238.506415600	66`
+
+### Links
+pipelines: 
+- `https://devblogs.microsoft.com/dotnet/system-io-pipelines-high-performance-io-in-net/?spm=a2ty_o01.29997173.0.0.299e55fbzZzmb2#system.io.pipelines`
+
+sockets:
+- `https://learn.microsoft.com/en-us/dotnet/fundamentals/networking/sockets/socket-services?spm=a2ty_o01.29997173.0.0.299e55fbzZzmb2#create-a-socket-server`
+
+Networking Programming with C:
+- `https://github.com/codeplea/Hands-On-Network-Programming-with-C`
+
+Beej's Guide to Network Programming:
+- `https://beej.us/guide/bgnet/html/split/
+
+
+# `telnet` summary
+|Server|Client|Result|
+|-|-|-|
+|**Windows**<br>- Redis Server|**WSL**<br>- `telnet 127.0.0.1 6969`|`telnet: Unable to connect to remote host: Connection refused`|
+|**WSL**<br>- Redis Server|**WSL**<br>- `redis-cli -p 6969 PING`|OK|
+
+
+# Useful bash
+|bash|description|example|
+|-|-|-|
+|`$(...)`|1. runs ... in child process<br>2. substitutes result back |change dir into dir of current file:<br>- `cd $(dirname $0)`|
