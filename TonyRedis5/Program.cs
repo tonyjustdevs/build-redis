@@ -12,7 +12,7 @@ namespace TonyRedis5
             TcpListener server = new TcpListener(System.Net.IPAddress.Any, 6969);
             server.Start();
             while (true)
-            {
+            {   //client sends: "ECHO hey"
                 Socket client = server.AcceptSocket();
                 Task.Run(() => HandleClient(client));
             }

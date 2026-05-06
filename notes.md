@@ -139,7 +139,7 @@ Beej's Guide to Network Programming:
 |-|-|-|
 |**Integer**:<br>`*[<+\|->]<value>\r\n`|`:` first byte<br><br>`[<+\|->]`: optional choice between `+` & `-`<br><br>`value`: obvious|**0** integer response:<br>`:0\r\n`<br><br>**1000** integer response:<br>`:1000\r\n`|
 |**Bulk String**:<br>`$<lengh>\r\n<data>\r\n`|`$`: first byte to say a bulk string is coming<br><br>`length`: length of string in bytes<br><br>`\r\n`: CRLN (carriage return line feed) or reset cursor & move next line<br><br>`data`: self-explanatory|**"hello"**:<br>`$5\r\nhello\r\n`<br><br>empty-string **""**:<br>`$0\r\n\r\n`|
+|**Array**:<br>`*<number-of-elements>\r\n<element-1>...<element-n>`<br><br>Note:<br>- Clients send commands to Redis server as RESP arrays|`*`: first byte identifier<br><br>`nbr_of_elemnts_in_arr`: self-explanatory<br><br>`element_1...element_n`:<br>each elements whole resp response sequentially|**empty arrays**:<br>`*0\r\n`<br><br>**["hello","world!"]**:<br>`*2\r\n$5\r\nhello\r\n$6\r\nworld!\r\n`<br>check:<br>`*2\r\n$5\r\nhello\r\n$5\r\nworld\r\n`<br><br>note:<br>**"hello"**:<br>`$5\r\nhello\r\n`<br><br>**"world!"**:<br>`$6\r\nworld!\r\n`|
 
-<!-- |**Array**<br><br>Note:<br>- Clients send commands to Redis server as RESP arrays|a|**empty arrays**:<br>`*0\r\n`| -->
 
 
