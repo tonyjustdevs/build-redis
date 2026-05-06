@@ -1,7 +1,7 @@
 ﻿using System.Net.Sockets;
 using System.Text;
 
-namespace TonyRedis5
+namespace TonyRedis5v2
 {
     internal class Program
     {
