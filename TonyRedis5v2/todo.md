@@ -1,11 +1,14 @@
 # BDYO Redis: Stage 5 / 115
 ### A. Psuedo-Steps
-0. [**svr**] Start Server
+0. [**svr**] Start Server: `port 6969` OK
+1. [**cli**] Sent Bytes to port `6969` OK
+1. [**svr**] Capture Bytes & Print to `Console` OK
 1. [**cli**] Sent Bytes: `*2\r\n$4\r\nECHO\r\n$3\r\nhey\r\n`
-2. [**svr**] Receive Bytes: `*2\r\n$4\r\nECHO\r\n$3\r\nhey\r\n`
-3. [**svr**] Parse Bytes: `Parse(bytes_received)`
-4. [**svr**] Send Response: `3\r\nhey\r\n`
-5. [**cli**] Receive Response: `3\r\nhey\r\n`
+1. [**svr**] Verify bytes received above
+1. [**svr**] Receive Bytes: `*2\r\n$4\r\nECHO\r\n$3\r\nhey\r\n`
+1. [**svr**] Parse Bytes: `Parse(bytes_received)`
+1. [**svr**] Send Response: `3\r\nhey\r\n`
+1. [**cli**] Receive Response: `3\r\nhey\r\n`
 
 
 ### B. Request-Response Summary

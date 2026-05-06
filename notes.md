@@ -149,14 +149,15 @@ Beej's Guide to Network Programming:
 
 |#|char(s)|ascii value<br>`ord("char")`|hex<br>`hex(ascii_int)`|binary<br>`bin(ascii_int)`|
 |-|-|-|-|-|
-|All|`*2\r\n`|- |-      |-          |
+|All|`*2\r\n`|- |-      |-          |`
 |1  |`*`     |42|`0x2a` |`0b101010` |
 |2  |`2`     |50|`0x32` |`0b110010` |
 |3  |`\r`    |13|`0xd`  |`0b1101`   |
 |4  |`\n`    |10|`0xa`  |`0b1010`   |
 
-
-
+|terminal|redis-cli sends|
+|-|-|
+|`printf "*2\r\n:666\r\n:420\r\n" \| nc localhost 6969`| `*2:666:420`|
 
 
 

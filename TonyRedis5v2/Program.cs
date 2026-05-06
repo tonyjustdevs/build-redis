@@ -22,9 +22,23 @@ namespace TonyRedis5v2
                 Console.WriteLine(con_res);
                 while (true)    
                 {
-                    byte[] buffer_received = new byte[1024];
+                    //byte[] buffer_received = new byte[1024];
+                    byte[] buffer_received = new byte[30];
                     int res = client.Receive(buffer_received);
-                    var buffer_list = buffer_received.ToList();
+                    var ascii_string =  Encoding.ASCII.GetString(buffer_received); // convert bytes to ascii chars
+
+                //[received] bytes to ascii:
+                //*1
+                //$5
+                //he
+
+                //[received] bytes to ascii:
+                //llo
+                    Console.WriteLine("[re] bytes: \n{0}\n", Convert.ToHexString(buffer_received));
+                //sample: [2A320D0A24340D0A4D415445]
+                Console.WriteLine("[re] bytes: \n{0}\n", BitConverter.ToString(buffer_received));
+                //sample: [2A-32-0D-0A-24-34-0D-0A-4D-41-54-45]
+                Console.WriteLine("[rec] ascii: \n{0}\n", ascii_string);
                     if (res==0)
                     {
                         break;
