@@ -127,7 +127,19 @@ Beej's Guide to Network Programming:
 |**WSL**<br>- Redis Server|**WSL**<br>- `redis-cli -p 6969 PING`|OK|
 
 
-# Useful bash
+# Useful commands
 |bash|description|example|
 |-|-|-|
 |`$(...)`|1. runs ... in child process<br>2. substitutes result back |change dir into dir of current file:<br>- `cd $(dirname $0)`|
+|`\r` Carriage Return|move cursor start of line|ascii 13|
+|`\n` Line Feed|move down one line|ascii 10|
+
+# `RESP` Protocol
+|Command|Description|Examples|
+|-|-|-|
+|**Integer**:<br>`*[<+\|->]<value>\r\n`|`:` first byte<br><br>`[<+\|->]`: optional choice between `+` & `-`<br><br>`value`: obvious|**0** integer response:<br>`:0\r\n`<br><br>**1000** integer response:<br>`:1000\r\n`|
+|**Bulk String**:<br>`$<lengh>\r\n<data>\r\n`|`$`: first byte to say a bulk string is coming<br><br>`length`: length of string in bytes<br><br>`\r\n`: CRLN (carriage return line feed) or reset cursor & move next line<br><br>`data`: self-explanatory|**"hello"**:<br>`$5\r\nhello\r\n`<br><br>empty-string **""**:<br>`$0\r\n\r\n`|
+
+<!-- |**Array**<br><br>Note:<br>- Clients send commands to Redis server as RESP arrays|a|**empty arrays**:<br>`*0\r\n`| -->
+
+
