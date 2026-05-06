@@ -142,6 +142,20 @@ Beej's Guide to Network Programming:
 |Simple **Arrays**:<br>`*<number-of-elements>\r\n<element-1>...<element-n>`<br><br>Note:<br>- Clients send commands to Redis server as RESP arrays|`*`: first byte identifier<br><br>`nbr_of_elemnts_in_arr`: self-explanatory<br><br>`element_1...element_n`:<br>each elements whole resp response sequentially|**empty arrays**: `*0\r\n`<br>**null arrays**: `*-1\r\n`<br><br>**["hello","world!"]**:<br>`*2\r\n$5\r\nhello\r\n$6\r\nworld!\r\n`<br>check:<br>`*2\r\n$5\r\nhello\r\n$5\r\nworld\r\n`<br><br>note:<br>**"hello"**:`$5\r\nhello\r\n`<br>**"world!"**: `$6\r\nworld!\r\n`<br><br>arrays can contain **mixed types**:<br>**[42 ,666,"hello"]:**<br>`*3\r\n`<br>`:42\r\n`<br>`:666\r\n`<br>`$5\r\n`<br>`hello\r\n`|
 |Mixed/Nested **Arrays**:<br> as above|as above|mixed **[42 ,666,"hello"]:**<br>`*3\r\n`<br>`:42\r\n`<br>`:666\r\n`<br>`$5\r\n`<br>`hello\r\n`<br><br>nested arrays **[[111,222,333],[gday,mateys]]**<br>`*2\r\n`<br>`*3\r\n`<br>`:111\r\n`<br>`:222\r\n`<br>`:333\r\n`<br>`*2\r\n`<br>`+gday\r\n`<br>`+mateys\r\n`|
 
+# Some Notes
+`*2\r\n`: 
+- is squence of **raw bytes**
+- each byte can be `char`, `hex`, `binary`
+
+|#|char(s)|ascii value<br>`ord("char")`|hex<br>`hex(ascii_int)`|binary<br>`bin(ascii_int)`|
+|-|-|-|-|-|
+|All|`*2\r\n`|- |-      |-          |
+|1  |`*`     |42|`0x2a` |`0b101010` |
+|2  |`2`     |50|`0x32` |`0b110010` |
+|3  |`\r`    |13|`0xd`  |`0b1101`   |
+|4  |`\n`    |10|`0xa`  |`0b1010`   |
+
+
 
 
 

@@ -15,7 +15,6 @@ namespace TonyRedis5v2
                 Socket client = server.AcceptSocket();
                 Task.Run(() => HandleClient(client));
             }
-            Console.WriteLine("TP Redis Server Stopped...");
         }
         static void HandleClient(Socket client)
             {
