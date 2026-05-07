@@ -166,7 +166,7 @@ Beej's Guide to Network Programming:
 |`hex_str = s.encode('ascii').hex()`|`2a320d0a24340d0a454`|string to hex|
 |`binary_str = ''.join(format(ord(c), '08b') for c in s)`|`001010100011001000001101...`|string to Binary representation (8 bits per character)|
 |`repr(bytes.fromhex(hex_str).decode('ascii'))`|`*2\r\n$4\r\nECHO\r\n$3\r\nhey\r\n`|bytes to og esaped msg|
-
+|`ascii_list = [42,50,13,10,36,52,13,10,69,67,72,79,13,10,36,51,13,10,104,101,121,13,10]`<br>`data = bytes(ascii_list)`<br>`data.decode('ascii', errors='replace')`(str)<br>`data.hex()`(hex)<br>`' '.join(f'{b:02x}' for b in data)`(hex space)<br>`' '.join(f'{b:08b}' for b in data)`(bin bits)|data:<br>`b'*2\r\n$4\r\nECHO\r\n$3\r\nhey\r\n'`|decimal bytes to raw bytes |
 
 
 |terminal|redis-cli sends|
