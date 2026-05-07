@@ -155,9 +155,35 @@ Beej's Guide to Network Programming:
 |3  |`\r`    |13|`0xd`  |`0b1101`   |
 |4  |`\n`    |10|`0xa`  |`0b1010`   |
 
+|Python|Example|Description|
+|-|-|-|
+|`b""`         |`bytes = b"*2\r\n$4\r\nECHO\r\n$3\r\nhey\r\n"`|This is bytes, not normal Unicode text|
+|`bytes.hex()` |`bytes.hex()`:<br>= `"2a320d0a24340d0a4543484f0d0a24330d0a6865790d0a"`|*Bytes* to **hex-string**|
+|`f"{b:02X}"`  |`print(" ".join(f"{b:02X}" for b in bytes))`:<br>= `2A 32 0D 0A 24 34 0D 0A 45 ..`|Bytes to *prettier* **hex-string**|
+|`list(bytes)"`|`print(list(bytes))`:<br>= `[42, 50, 13, 10, 36, 52, ..]`|Bytes to **decimal byte values**|
+|`bytes.decode("ascii")"`|`print(msg.decode("ascii"))`:<br>`*2`<br>`$4`<br>`ECHO`<br>`$3`<br>`hey`<br><br>note: `\r\n` $\to$ actual newlines.|Bytes to **ascii**|
+|`s = "*2\r\n$4\r\nECHO\r\n$3\r\nhey\r\n"`<br>`ascii_values = [ord(c) for c in s]`|`[42, 50, 13, 10, 36, 52, 13...] `|string to ascii values|
+|`hex_str = s.encode('ascii').hex()`|`2a320d0a24340d0a454`|string to hex|
+|`binary_str = ''.join(format(ord(c), '08b') for c in s)`|`001010100011001000001101...`|string to Binary representation (8 bits per character)|
+|`repr(bytes.fromhex(hex_str).decode('ascii'))`|`*2\r\n$4\r\nECHO\r\n$3\r\nhey\r\n`|bytes to og esaped msg|
+
+
+
 |terminal|redis-cli sends|
 |-|-|
 |`printf "*2\r\n:666\r\n:420\r\n" \| nc localhost 6969`| `*2:666:420`|
 
+
+
+|Useful C# Methods|Output|Namespace|
+|-|-|-|
+|`Convert.ToHexString(byte[])`|string: `"2A320D0A24340D0A4D41..."`|`System`|
+|`BitConverter.ToString(byte[])`|string: `"2A-32-0D-0A-24-34-0D-0A-4D-41-..."`|`System`|
+|`foreach(...){WL($"{b:X2} ");}`|string: `"2A 32 0D 0A ..."`|`System.Text.Encoding.ASCII.GetBytes(<RAW_BYTES>)`|
+|`foreach(...){WL($"{b} ");}`|int: `"..."`|`System.Text.Encoding.ASCII.GetBytes(<RAW_BYTES>)`|
+|`ASCII.GetString(msg)`|string: `"..."`|`System.Text.Encoding.ASCII.GetString(<RAW_BYTES>)`|
+|`byte[] bytes = Encoding.ASCII.GetBytes(s);`<br>`Wr("ASCII Decimal: " + string.Join(", ", bytes));`| `42, 50, 13, 10, 36, 52...` |RESP msg to  ASCII values (decimal)|
+|`string hex = BitConverter.ToString(bytes).Replace("-", "").ToLower();`<br>`Wr("\nHex: " + hex);`|`2a320d0a24340d0a4543484`|string to hex|
+|`byte[] hexBytes = Enumerable.Range(0, hex.Length / 2`<br>`.Select(x => Convert.ToByte(hex.Substring(x * 2, 2), 16))`<br>`.ToArray();`<br>`string originalFromHex = Encoding.ASCII.GetString(hexBytes);`<br>`Wr("\nFrom Hex back to string: "`<br>` + originalFromHex`<br>`.Replace("\r", "\\r").Replace("\n", "\\n"));`|`*2\r\n$4\r\nECHO\r\n$3\r\nhey\r\n`|hex to string|
 
 
