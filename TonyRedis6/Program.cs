@@ -22,22 +22,23 @@ namespace TonyRedis6
         static void HandleClient(Socket client)
         {
             WriteLine($"client connected: [id: {System.Threading.Thread.CurrentThread.ManagedThreadId}]");
-            Thread.Sleep(5000);
-            byte[] bytes_arr = new byte[1024]; //byte[] == [01010101, 01001000, 01010100, etc]
+            //Thread.Sleep(5000);
+            byte[] b_arr = new byte[1024]; //byte[] == [01010101, 01001000, 01010100, etc]
             while (true)
             {
-                int total_bytes_received =client.Receive(bytes_arr);  
+                int b_int =client.Receive(b_arr);  
                 
-                if (total_bytes_received==0){break;} // disconnect.
+                if (b_int==0){break;} // disconnect.
 
-                var hex_str =Convert.ToHexString(bytes_arr, 0, total_bytes_received); // CORRECT: Only convert received
-                var ascii_str = Encoding.ASCII.GetString(bytes_arr,0, total_bytes_received);
+                var hex_str =Convert.ToHexString(b_arr, 0, b_int); 
+                var ascii_str = Encoding.ASCII.GetString(b_arr,0, b_int);
                 
-                WriteLine($"{hex_str} [l:{hex_str.Length}](b:{total_bytes_received})");
-                WriteLine($"\n{ascii_str} [l:{ascii_str.Length}](b:{total_bytes_received})");
-                // convert to ascii for easy parasing
+                WriteLine($"hex: {hex_str}");
+                WriteLine($"asc: {ascii_str}");
+                
                 client.Send(Encoding.ASCII.GetBytes("+PONG\r\n"));
-                
+                //client.Send("+PONG\r\n");
+
             }
 
         }
