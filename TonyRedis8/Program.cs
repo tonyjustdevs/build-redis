@@ -19,7 +19,7 @@ namespace TonyRedis8
     
         static void HandleClient(Socket client)
         {
-            WriteLine("client connected [{0}]", Thread.CurrentThread.ManagedThreadId);
+            WriteLine("\n\nclient connected [{0}]", Thread.CurrentThread.ManagedThreadId);
             byte[] b_arr = new byte[1024];
             int i = 0;
             while (true)
@@ -30,11 +30,9 @@ namespace TonyRedis8
                 WriteLine($"recd_{i}: {Encoding.ASCII.GetString(b_arr)} [b_int: {b_int}]");
                 //[BUG] client only sends one packet and then waits,
                 //      server waits too.
+                client.Send(Encoding.ASCII.GetBytes("+processing...\r\n"));
             }
-            string received_ascii = Encoding.ASCII.GetString(b_arr);
-            WriteLine($"received_ascii: {received_ascii}");
-            WriteLine("sending reply: '+PONGification!' [{0}]", Thread.CurrentThread.ManagedThreadId);
-            client.Send(Encoding.ASCII.GetBytes("+h+PONGification!\r\n"));
+            client.Send(Encoding.ASCII.GetBytes("+PONGification!\r\n"));
         }
     
     }
