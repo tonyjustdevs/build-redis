@@ -7,6 +7,8 @@
   <Project Path="TonyRedis5/TonyRedis5.csproj" Id="21651006-785a-4090-8096-94d13c199bf0" />
   <Project Path="TonyRedis5v2/TonyRedis5v2.csproj" />
   <Project Path="TonyRedis6/TonyRedis6.csproj" Id="daa20900-f2ab-4d03-ab0c-a3f9573d1d6c" />
+  <Project Path="TonyRedis7/TonyRedis7.csproj" />
+  <Project Path="TonyRedis8/TonyRedis8.csproj" Id="ce9c2c33-cda0-4612-b7b5-6f41041ed4e5" />
   <Project Path="TonysRedis/TonysRedis.csproj">
     <Build Solution="Debug|*" Project="false" />
   </Project>

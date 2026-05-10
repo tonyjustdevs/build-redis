@@ -187,3 +187,4 @@ Beej's Guide to Network Programming:
 |`byte[] hexBytes = Enumerable.Range(0, hex.Length / 2`<br>`.Select(x => Convert.ToByte(hex.Substring(x * 2, 2), 16))`<br>`.ToArray();`<br>`string originalFromHex = Encoding.ASCII.GetString(hexBytes);`<br>`Wr("\nFrom Hex back to string: "`<br>` + originalFromHex`<br>`.Replace("\r", "\\r").Replace("\n", "\\n"));`|`*2\r\n$4\r\nECHO\r\n$3\r\nhey\r\n`|hex to string|
 
 
+# GITHUB WORKFLOW
