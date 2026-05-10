@@ -188,3 +188,21 @@ Beej's Guide to Network Programming:
 
 
 # GITHUB WORKFLOW
+Create **Development** Branch `dev`(once): 
+- `git checkout -b dev` 
+- `git push -u origin dev`
+
+Create **Feature** Branch `feature`
+- `git checkout -b feature/the-cool-new-feature`
+- `git push -u origin feature/the-cool-new-feature`
+
+| Prefix      | Meaning               |
+| ----------- | --------------------- |
+| `feature/`  | new feature           |
+| `bugfix/`   | bug fix               |
+| `hotfix/`   | urgent production fix |
+| `refactor/` | architecture cleanup  |
+| `test/`     | experiments/tests     |
+| `release/`  | release preparation   |
+
+ 
