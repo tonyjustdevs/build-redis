@@ -197,7 +197,6 @@ Create **Feature** Branch `feature`
 - `git push -u origin feature/the-cool-new-feature`
 
 | Prefix      | Meaning               |
-| ----------- | --------------------- |
 | `feature/`  | new feature           |
 | `bugfix/`   | bug fix               |
 | `hotfix/`   | urgent production fix |
@@ -206,3 +205,29 @@ Create **Feature** Branch `feature`
 | `release/`  | release preparation   |
 
  
+**TCP DUMP**
+Goal: 
+- Capture traffice inside WSL2 (export to file)
+- Open file in Windows Wireshark
+
+**Capture in WSL2**
+- Capture traffic loopback `lo` (client & server comms on `127.0.0.1`), filter port `6969`, save file `.pcap`:
+  - `sudo tcpdump -i lo port 6969 -w tcp_capture.pcap`
+- Run server and send msgs then disconnect
+
+Common intefaces:
+- `-i eth0` — First ethernet adapter
+- `-i wlan0` — Wi-Fi adapter
+- `-i any` — Listen on ALL interfaces at once
+
+Other traffic filter expression
+-`port 6969 and tcp` — Only TCP traffic on port 6969
+-`port 6969 or port 8080` — Capture both ports
+-`host 192.168.1.5 and port 6969` — Only from/to a specific IP
+
+Live
+`sudo tcpdump -i lo port 6969`
+Flags
+- `SYN`: Connection opening (three-way handshake)
+- `PSH`/`ACK`: Actual data transfer
+- `FIN`: "receive returns 0" moment!
