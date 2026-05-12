@@ -1,17 +1,3 @@
 <Solution>
-  <Project Path="TonyRedis10/TonyRedis10.csproj" />
-  <Project Path="TonyRedis11/TonyRedis11.csproj" />
-  <Project Path="TonyRedis2/TonyRedis2.csproj" Id="b789bd55-a22a-42e2-89f8-b4f76bd178db">
-    <Build Solution="Debug|*" Project="false" />
-  </Project>
-  <Project Path="TonyRedis3/TonyRedis3.csproj" Id="aae4117c-04fe-4297-8f22-57bc590ccba5" />
-  <Project Path="TonyRedis4/TonyRedis4.csproj" Id="3c5e8565-58ed-46a5-b718-d93630e29e6b" />
-  <Project Path="TonyRedis5/TonyRedis5.csproj" Id="21651006-785a-4090-8096-94d13c199bf0" />
-  <Project Path="TonyRedis5v2/TonyRedis5v2.csproj" />
-  <Project Path="TonyRedis6/TonyRedis6.csproj" Id="daa20900-f2ab-4d03-ab0c-a3f9573d1d6c" />
-  <Project Path="TonyRedis7/TonyRedis7.csproj" />
-  <Project Path="TonyRedis9/TonyRedis9.csproj" />
-  <Project Path="TonysRedis/TonysRedis.csproj">
-    <Build Solution="Debug|*" Project="false" />
-  </Project>
+  <Project Path="TPRedis002/TPRedis002.csproj" />
 </Solution>

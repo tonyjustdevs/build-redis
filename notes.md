@@ -167,7 +167,7 @@ Beej's Guide to Network Programming:
 |`binary_str = ''.join(format(ord(c), '08b') for c in s)`|`001010100011001000001101...`|string to Binary representation (8 bits per character)|
 |`repr(bytes.fromhex(hex_str).decode('ascii'))`|`*2\r\n$4\r\nECHO\r\n$3\r\nhey\r\n`|bytes to og esaped msg|
 |`ascii_list = [42,50,13,10,36,52,13,10,69,67,72,79,13,10,36,51,13,10,104,101,121,13,10]`<br>`data = bytes(ascii_list)`<br>`data.decode('ascii', errors='replace')`(str)<br>`da=ta.hex()`(hex)<br>`' '.join(f'{b:02x}' for b in data)`(hex space)<br>`' '.join(f'{b:08b}' for b in data)`(bin bits)|data:<br>`b'*2\r\n$4\r\nECHO\r\n$3\r\nhey\r\n'`|decimal bytes to raw bytes |
-
+|`int("11000011",2)`|binary value of bytes|
 
 |terminal|redis-cli sends|
 |-|-|
@@ -184,7 +184,7 @@ Beej's Guide to Network Programming:
 |`ASCII.GetString(msg)`|string: `"..."`|`System.Text.Encoding.ASCII.GetString(<RAW_BYTES>)`|
 |`byte[] bytes = Encoding.ASCII.GetBytes(s);`<br>`Wr("ASCII Decimal: " + string.Join(", ", bytes));`| `42, 50, 13, 10, 36, 52...` |RESP msg to  ASCII values (decimal)|
 |`string hex = BitConverter.ToString(bytes).Replace("-", "").ToLower();`<br>`Wr("\nHex: " + hex);`|`2a320d0a24340d0a4543484`|string to hex|
-|`byte[] hexBytes = Enumerable.Range(0, hex.Length / 2`<br>`.Select(x => Convert.ToByte(hex.Substring(x * 2, 2), 16))`<br>`.ToArray();`<br>`string originalFromHex = Encoding.ASCII.GetString(hexBytes);`<br>`Wr("\nFrom Hex back to string: "`<br>` + originalFromHex`<br>`.Replace("\r", "\\r").Replace("\n", "\\n"));`|`*2\r\n$4\r\nECHO\r\n$3\r\nhey\r\n`|hex to string|
+|`byte[] hexBytes = Enumerable.Range(0, hex.Length / 2`<br>`.Select(x => Convert.ToByte(hex.Substring(x * 2, 2), 16))`<br>`.ToArray();`<br>`string originalFromHex = Encoding.ASCII.GetString(hexBytes);`<br>`Wr("\nFrom Hex back to string: "`<br>` + originalFromHex`<br>`.Replace("\r", "\\r").Replace("\n", "\\n"));`|`*2\r\n$4\r\nECHO\r\n$3\r\nhey\r\n`|hex to **string**|
 
 
 # GITHUB WORKFLOW
@@ -227,7 +227,66 @@ Other traffic filter expression
 
 Live
 `sudo tcpdump -i lo port 6969`
+
 Flags
-- `SYN`: Connection opening (three-way handshake)
-- `PSH`/`ACK`: Actual data transfer
-- `FIN`: "receive returns 0" moment!
+
+- `SYN`:    Connection opening (three-way handshake)
+- `PSH`/    `ACK`: Actual data transfer
+- `FIN`:    "receive returns 0" moment!
+- `[S]`:    SYN flag set
+- `[S.]`:   SYN-ACK (both SYN and ACK flags)
+- `[.]`:    ACK only
+- `[P.]`:   PUSH-ACK (data with ACK)
+- `[F.]`:   FIN-ACK (finish with ACK)
+
+# Encoding
+Packet has two major parts, they may be encoded differently:
+- structural (redis: `ascii`)
+- payload (redis: `raw bytes`)
+
+
+# `.NET string` are stored as `UTF-16` Unicode characters
+- A string is a sequence of characters.
+- Each character is `UTF-16` (2-bytes or 4 hex-values, 1 byte has 2 hex-values)
+
+# Redis serialization protocol  (`RESP`)
+Client sends request to Redis Server as:
+- an array of strings (`commands` & `arguments`)
+
+### 1. Network Layer 
+Default port: `6379`
+
+### 2. Request-Response model 
+- Requests can be `pipedlined`: Allow clients to send **multiple commands** at once and wait for replies later.
+- `RESP2` connection subscribed to a `Pub/Sub` Channel, `push` protocol
+  - client **not required** to send `commands`
+  - server automically sends messages to simps.
+- `Monitor` **command**: connection becomes ad-hoc push mode.
+- `Protected mode`: `-DENIED` (denied & terminated) reply to `non-loop` address
+- `RESP3 Push` type. Not specific to any client **command**. Server sends out-of-band data.
+
+### 3. RESP protocol description 
+First `byte` determines `data type`
+
+RESP is a `request-response` protocol:
+- Client sends `array` of `bulk-strings` 
+  - `Command`: `First` (& sometimes Second) `bulk-string` (of the array)
+  - `Arguments`: of the command, are **subsequent** elements of the array 
+
+`Control Sequences` encoded in standard `ASCII`.
+
+3 RESP data types:
+- `simple`: 
+  - e.g. plain literal values, booleans, integers, string (without carraige return `\r` & line feed `\n`)
+- `bulk`: 
+  - e.g. bulk-strings contain any binary data (binary or blob)
+  - can be encoded/decoded further, e.g. wide mult-byte encoding, by client.
+- `aggregate`: e.g. `Arrays` & `Maps`, varying numbers of sub-elements & nesting levels.
+
+#### 4. Data Types
+|Type|$1^{st}$ `byte`|Command|Example|Client Parser Pseudo|`C#` sample|
+|-|-|-|-|-|-|
+|**Simple strings**<br><br>format:<br>`+<actual-data>\r\n`|`+`|Any **string**<br><br>Must not contain:<br>`\r` or `\n`<br><br>Termination:<br>`\r\n`|`+OK\r\n` (wire format) <br><br>`+`: protocol metadata<br>`OK`: payload<br>`\r\n`: termination marker|- See `43` (`+`): a simple string incoming<br>- collect bytes (aka extra payload) until `13 10` (`\r\n`)|`string raw = "+OK\r\n"`<br><br>`string parsed = raw.Substring(1, raw.Length - 3)`|
+|**Integers**<br><br>format:<br>`:[<+\|->]<value>\r\n`|`:`|tba|`:0\r\n`<br><br>`:1000\r\n`|tba|tba|tba|
+|**Bulk strings**<br><br>format:<br>`$<length>\r\n<data>\r\ns`|`$`|tba|`$5\r\nhello\r\n`: hello<br><br>`$0\r\n\r\n`: empty string<br><br>`$-1\r\n`: null bulk string|tba|tba|tba|
+|**Arrays**<br><br>format:<br>`*<number-of-elements>\r\n<element-1>...<element-n>`|`*`|tba|`*0\r\n`: empty array|tba|tba|tba|
