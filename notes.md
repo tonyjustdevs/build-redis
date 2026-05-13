@@ -289,4 +289,20 @@ RESP is a `request-response` protocol:
 |**Simple strings**<br><br>format:<br>`+<actual-data>\r\n`|`+`|Any **string**<br><br>Must not contain:<br>`\r` or `\n`<br><br>Termination:<br>`\r\n`|`+OK\r\n` (wire format) <br><br>`+`: protocol metadata<br>`OK`: payload<br>`\r\n`: termination marker|- See `43` (`+`): a simple string incoming<br>- collect bytes (aka extra payload) until `13 10` (`\r\n`)|`string raw = "+OK\r\n"`<br><br>`string parsed = raw.Substring(1, raw.Length - 3)`|
 |**Integers**<br><br>format:<br>`:[<+\|->]<value>\r\n`|`:`|tba|`:0\r\n`<br><br>`:1000\r\n`|tba|tba|tba|
 |**Bulk strings**<br><br>format:<br>`$<length>\r\n<data>\r\ns`|`$`|tba|`$5\r\nhello\r\n`: hello<br><br>`$0\r\n\r\n`: empty string<br><br>`$-1\r\n`: null bulk string|tba|tba|tba|
-|**Arrays**<br><br>format:<br>`*<number-of-elements>\r\n<element-1>...<element-n>`|`*`|tba|`*0\r\n`: empty array|tba|tba|tba|
+|**Arrays**<br><br>format:<br>`*<number-of-elements>\r\n<element-1>...<element-n>`|`*`|tba|`*0\r\n`: empty array<br><br>`*2\r\n$5\r\n`:array of two bulk strings "hello" & "world!"|tba|tba|tba|
+
+
+Q&A
+Q: What is `Encoding.UTF8.GetBytes("+PONG\r\n")` ?
+A: `C#` stores strings (a list of `characters` within `""`), such as `"hello"` or `"+PONG\r\n"` as `utf-8` encoding.
+
+What is `utf-8`, it is a set of rules for intepreting to and from `bytes`. Recall, a `byte` is a way to represent a number with `1` & `0`s (e.g. `0000-0001` is `1`, `0000-0010` is `2`, & `0000-0011` is 3 etc). 
+Bytes, or numbers, by themselves, have no meaning. 
+
+`UTF-8` is a mapping (aka **character encoding**) between a set of characters (officially **Unicode characters**) which humans can read (e.g. 'h', '🍆', 'ẩ').
+
+# Search for these red flags:  
+- `+=` in a loop → Replace with `StringBuilder`  
+- `new byte[100000]` → Replace with `ArrayPool<byte>.Shared.Rent()`
+- `await Task.Run(() => Thread.Sleep(...))` → Delete and use async I/O instead
+- Run a **memory profile** → See the 10-100x reduction in allocations
