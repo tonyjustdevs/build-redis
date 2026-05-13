@@ -1,5 +1,7 @@
 #!/bin/bash
 
+clear
+
 (
     pwd
     cd $(dirname "$0")
