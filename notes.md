@@ -292,7 +292,7 @@ RESP is a `request-response` protocol:
 |**Arrays**<br><br>format:<br>`*<number-of-elements>\r\n<element-1>...<element-n>`|`*`|tba|`*0\r\n`: empty array<br><br>`*2\r\n$5\r\n`:array of two bulk strings "hello" & "world!"|tba|tba|tba|
 
 
-Q&A
+**Q**&A
 Q: What is `Encoding.UTF8.GetBytes("+PONG\r\n")` ?
 A: `C#` stores strings (a list of `characters` within `""`), such as `"hello"` or `"+PONG\r\n"` as `utf-8` encoding.
 
@@ -306,3 +306,5 @@ Bytes, or numbers, by themselves, have no meaning.
 - `new byte[100000]` → Replace with `ArrayPool<byte>.Shared.Rent()`
 - `await Task.Run(() => Thread.Sleep(...))` → Delete and use async I/O instead
 - Run a **memory profile** → See the 10-100x reduction in allocations
+
+`RESP` $Array \rightarrow$ [`Bulk-String` $command$, `Bulk-String` $args...$]
