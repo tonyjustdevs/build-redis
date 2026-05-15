@@ -14,7 +14,8 @@ partial class Program
         Console.WriteLine("Starting TPRedis002-Server...");
 
         TcpListener server = new TcpListener(System.Net.IPAddress.Any, 6969);
-        server.Start();
+        //TcpListener server = new TcpListener(System.Net.IPAddress.Any, 6379);
+        server.Start(); 
         while (true)
         {
             Socket client = server.AcceptSocket();
