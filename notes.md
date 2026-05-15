@@ -308,3 +308,21 @@ Bytes, or numbers, by themselves, have no meaning.
 - Run a **memory profile** → See the 10-100x reduction in allocations
 
 `RESP` $Array \rightarrow$ [`Bulk-String` $command$, `Bulk-String` $args...$]
+
+
+Examples
+|redis-client:<br>command‑line argument|data structure|Redis Serialization Protocol (`RESP`) |
+|-|-|-|
+|`PING` | array `["PING"]` | `*1\r\n$4\r\nPING\r\n`|
+|`SET mykey Hello` | array `["SET","mykey","Hello"]` | `*3\r\n$3\r\nSET\r\n$5\r\nmykey\r\n$5\r\nHello\r\n`|
+
+|tcpdump args|description|
+|-|-|
+|`sudo tcpdump -i lo -X -s 0 port 6969`|gotta catch'em all|
+|`-i lo`    |  capture on the loopback interface (traffic inside your own machine).|
+|`-X`       | display the packet data in both hex and ASCII (so you can see the actual bytes).|
+|`-s 0`     | snap length zero -> capture the full packet (the output shows 262144 bytes max).|
+|`-nn`      | no name resolution: `127.0.0.1` instead of `localhost`|
+|`port 6969`| only show traffic involving TCP port 6969|
+|`sudo tcpdump -i lo -s 0 -w redis_capture.pcap port 6969`|Write File:<br>- Capture on `loopback`:<br>- if app and Redis are on **same machine**|
+|`sudo tcpdump -i lo -s 0 -w redis_capture.pcap 'port 6969 or port 6379'`|Write File:<br>- Multiple ports|
