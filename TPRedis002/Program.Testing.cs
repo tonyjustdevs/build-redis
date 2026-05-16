@@ -41,7 +41,6 @@ partial class Program()
         }
     }
 
-
     public static void PrintHexBytes(int b_int, byte[] buffer, bool run = true)
     {
         if (run)
@@ -193,7 +192,8 @@ partial class Program()
             //var final_response_bytes = ApplyRedisProtocolToOneBulkString(payload_bytes);
             #endregion
 
-            byte[] response_payload = ParseRESPBytes(b_int, buffer);
+            //byte[] response_payload = ParseRESPBytes(b_int, buffer);
+            byte[] response_payload = GetHexBytesFromRawBytes(b_int, buffer);
             #region payload_v2
             // [case-1] {PING} cmd, No-Arguments
             //  *  1 \r \n  $  4 \r \n  P  I  N  G \r \n
@@ -216,6 +216,7 @@ partial class Program()
     {
         string hex_bytes = Convert.ToHexString(buffer,0,b_int);
         string utf8bytes = Encoding.UTF8.GetString(buffer,0,b_int);
+        string raw = Encoding.UTF8.GetString(buffer,0,b_int);
         WriteLine($"recd utf8str: {utf8bytes}");
         WriteLine($"recd hexystr: {hex_bytes}");
         if (hex_bytes == "2A310D0A24340D0A50494E470D0A") // *1\r\n$4\r\nPING\r\n
@@ -257,9 +258,9 @@ partial class Program()
             WriteLine("hex__s3: {0}", s3of5_utf8_hex_bytes );
             WriteLine("hex__s4: {0}", s4of5_utf8_hex_bytes );
             WriteLine("hex__s5: {0}", s5of5_utf8_hex_bytes ); //hex__s5: 69 69 69 0D 0A
-            WriteLine("hex_s5a: {0}[..^2] (exp:6969690D)", s5of5_utf8_hex_bytes[..^2] ); //hex__s5: 69 69 69 0D
-            WriteLine("hex_s5b: {0}[..^4] (exp:696969)", s5of5_utf8_hex_bytes[..^4] ); //hex__s5: 69 69 69 
-            WriteLine("hex_s5c: {0}[..^6] (exp:6969)", s5of5_utf8_hex_bytes[..^6] ); //hex__s5: 69 69 
+            WriteLine("hex_s5a: {0}[..^2] (exp:6969690D)", s5of5_utf8_hex_bytes[..^2] ); //hex__s5: 69 69 69 0D [0A}
+            WriteLine("hex_s5b: {0}[..^4] (exp:696969)", s5of5_utf8_hex_bytes[..^4] ); //hex__s5:   69 69 69 |  [0D][0A] 
+            //WriteLine("hex_s5c: {0}[..^6] (exp:6969)", s5of5_utf8_hex_bytes[..^6] ); //hex__s5: 69 69 
 
 
         }
@@ -268,6 +269,65 @@ partial class Program()
 
     }
 
+    public static byte[] GetHexBytesFromRawBytes(int b_int, byte[] buffer)
+    {
+        string hexy_bytes = Convert.ToHexString(buffer, 0, b_int); // 13 bytes == 26 hex-characters
+        WriteLine($"hex_bytes: {hexy_bytes}");
+
+        string RespCmd = GetRespCmdViaHexBytes(hexy_bytes);
+        //RespCmd-1:    ECHO
+        //RespCmd-3:    PING
+        //RespCmd-ETC:  ??? ERROR
+
+        return [];
+        //buffer
+    }
+
+    public static string GetRespCmdViaHexBytes(string hexy_bytes) 
+    {
+        
+        string echo_resp_string_id = "2A320D0A24340D0A4543484F0D0A";
+        string ping_resp_string_id = "2A310D0A24340D0A50494E470D0A"; // PING: *1\r\n$4\r\nPING\r\n
+
+        if (hexy_bytes == ping_resp_string_id)
+        {
+            WriteLine("do ping!");
+        }
+
+        else if (hexy_bytes[..echo_resp_string_id.Length] == "2A320D0A24340D0A4543484F0D0A")
+        {
+            WriteLine("do echo!!! echoo echooo");
+            string[] hexy_splits = hexy_bytes.Split("0D0A", 5);
+            WriteLine($"Splitting: {hexy_bytes}\n(exp: \"2A32\",\"2434\",\"4543484F\",\"2435\",\"61616161610D0A");
+            //foreach (var hex in hexy_splits)
+            //{
+            //    WriteLine(hex);
+            //    //(exp: "2A32","2434","4543484F","2435","61616161610D0A")
+            //    //(exp:   "*2",  "$4",    "ECHO",  "$5",      "aaaaaD0A")
+            //    //( "*2"        :   resp_1of5_cmd_arraycount
+            //    //  "$4"        :   resp_2of5_bulkstr_bytecount
+            //    //  "ECHO"      :   resp_3of5_bulkstr_payload
+            //    //  "$5"        :   resp_4of5_cmdarg_bytecount
+            //    //  "aaaaaD0A"? :   resp_5of5_cmdarg_payload
+
+            //}
+            string resp_1of5_cmd_arraycount     = hexy_splits[0];
+            string resp_2of5_bulkstr_bytecount  = hexy_splits[1];
+            string resp_3of5_bulkstr_payload    = hexy_splits[2];
+            string resp_4of5_cmdarg_bytecount   = hexy_splits[3];
+            string resp_5of5_cmdarg_payload     = hexy_splits[4];
+
+
+
+
+        }
+
+            // ECHO aaaaa: 
+            // *2\r\n$4\r\nECHO        \r\n   $   5 \r\n aaaaa\r\n
+            // 2A320D0A24340D0A4543484F0D0A   24 35 0D0A 61616161610D0A
+
+        return "bro";
+    }
 
 
 }
