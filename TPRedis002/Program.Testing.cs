@@ -235,23 +235,22 @@ partial class Program()
             WriteLine($"hex_string: {hex_string} (Split() '0D0A'");     //2A32 2434 4543484F 2435 6969696969
             WriteLine($"utf8string: {utf8string} (Split() '\\r\\n'");   // * 2  $ 4  E C H O  $ 5  i i i i i 
 
+            //var s1of5_utf8_fbyte_arrycount     = split_utf8bytes[0]; // *2     == 2A32
+            //var s2of5_utf8_cmd_dtype_bytecount = split_utf8bytes[1]; // $4     == 2434
+            //var s3of5_utf8_cmd                 = split_utf8bytes[2]; // ECHO   == 4543484F
+            //var s4of5_utf8_arg_dtype_bytecount = split_utf8bytes[3]; // iiiii  == 6969696969
+            //var s5of5_utf8_arg                 = split_utf8bytes[4]; // $4     == 2434
+            //WriteLine("utf8_s1: {0}", s1of5_utf8_fbyte_arrycount);
+            //WriteLine("utf8_s2: {0}", s2of5_utf8_cmd_dtype_bytecount);
+            //WriteLine("utf8_s3: {0}", s3of5_utf8_cmd);
+            //WriteLine("utf8_s4: {0}", s4of5_utf8_arg_dtype_bytecount);
+            //WriteLine("utf8_s5: {0}", s5of5_utf8_arg);
+
             var s1of5_utf8_hex_bytes = split_hex_bytes[0]; // *2     == 2A32
             var s2of5_utf8_hex_bytes = split_hex_bytes[1]; // $4     == 2434
             var s3of5_utf8_hex_bytes = split_hex_bytes[2]; // ECHO   == 4543484F
             var s4of5_utf8_hex_bytes = split_hex_bytes[3]; // iiiii  == 6969696969
             var s5of5_utf8_hex_bytes = split_hex_bytes[4]; // $4     == 2434
-
-            var s1of5_utf8_fbyte_arrycount     = split_utf8bytes[0]; // *2     == 2A32
-            var s2of5_utf8_cmd_dtype_bytecount = split_utf8bytes[1]; // $4     == 2434
-            var s3of5_utf8_cmd                 = split_utf8bytes[2]; // ECHO   == 4543484F
-            var s4of5_utf8_arg_dtype_bytecount = split_utf8bytes[3]; // iiiii  == 6969696969
-            var s5of5_utf8_arg                 = split_utf8bytes[4]; // $4     == 2434
-
-            WriteLine("utf8_s1: {0}", s1of5_utf8_fbyte_arrycount);
-            WriteLine("utf8_s2: {0}", s2of5_utf8_cmd_dtype_bytecount);
-            WriteLine("utf8_s3: {0}", s3of5_utf8_cmd);
-            WriteLine("utf8_s4: {0}", s4of5_utf8_arg_dtype_bytecount);
-            WriteLine("utf8_s5: {0}", s5of5_utf8_arg);
 
             WriteLine("hex__s1: {0}", s1of5_utf8_hex_bytes );
             WriteLine("hex__s2: {0}", s2of5_utf8_hex_bytes );
