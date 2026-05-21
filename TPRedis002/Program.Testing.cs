@@ -193,7 +193,7 @@ partial class Program()
             #endregion
 
             //byte[] response_payload = ParseRESPBytes(b_int, buffer);
-            byte[] response_payload = GetHexBytesFromRawBytes(b_int, buffer);
+            byte[] response_payload = OLD_GetHexBytesFromRawBytes(b_int, buffer);
             #region payload_v2
             // [case-1] {PING} cmd, No-Arguments
             //  *  1 \r \n  $  4 \r \n  P  I  N  G \r \n
@@ -212,7 +212,7 @@ partial class Program()
         }
     }
 
-    public static byte[] ParseRESPBytes(int b_int, byte[] buffer) 
+    public static byte[] OLD_ParseRESPBytes(int b_int, byte[] buffer) 
     {
         string hex_bytes = Convert.ToHexString(buffer,0,b_int);
         string utf8bytes = Encoding.UTF8.GetString(buffer,0,b_int);
@@ -246,19 +246,19 @@ partial class Program()
             //WriteLine("utf8_s4: {0}", s4of5_utf8_arg_dtype_bytecount);
             //WriteLine("utf8_s5: {0}", s5of5_utf8_arg);
 
-            var s1of5_utf8_hex_bytes = split_hex_bytes[0]; // *2     == 2A32
-            var s2of5_utf8_hex_bytes = split_hex_bytes[1]; // $4     == 2434
-            var s3of5_utf8_hex_bytes = split_hex_bytes[2]; // ECHO   == 4543484F
-            var s4of5_utf8_hex_bytes = split_hex_bytes[3]; // iiiii  == 6969696969
-            var s5of5_utf8_hex_bytes = split_hex_bytes[4]; // $4     == 2434
+            //var s1of5_utf8_hex_bytes = split_hex_bytes[0]; // *2     == 2A32
+            //var s2of5_utf8_hex_bytes = split_hex_bytes[1]; // $4     == 2434
+            //var s3of5_utf8_hex_bytes = split_hex_bytes[2]; // ECHO   == 4543484F
+            //var s4of5_utf8_hex_bytes = split_hex_bytes[3]; // iiiii  == 6969696969
+            //var s5of5_utf8_hex_bytes = split_hex_bytes[4]; // $4     == 2434
 
-            WriteLine("hex__s1: {0}", s1of5_utf8_hex_bytes );
-            WriteLine("hex__s2: {0}", s2of5_utf8_hex_bytes );
-            WriteLine("hex__s3: {0}", s3of5_utf8_hex_bytes );
-            WriteLine("hex__s4: {0}", s4of5_utf8_hex_bytes );
-            WriteLine("hex__s5: {0}", s5of5_utf8_hex_bytes ); //hex__s5: 69 69 69 0D 0A
-            WriteLine("hex_s5a: {0}[..^2] (exp:6969690D)", s5of5_utf8_hex_bytes[..^2] ); //hex__s5: 69 69 69 0D [0A}
-            WriteLine("hex_s5b: {0}[..^4] (exp:696969)", s5of5_utf8_hex_bytes[..^4] ); //hex__s5:   69 69 69 |  [0D][0A] 
+            WriteLine("hex__s1: {0}", split_hex_bytes[0]);
+            WriteLine("hex__s2: {0}", split_hex_bytes[1]);
+            WriteLine("hex__s3: {0}", split_hex_bytes[2]);
+            WriteLine("hex__s4: {0}", split_hex_bytes[3]);
+            WriteLine("hex__s5: {0}", split_hex_bytes[4]); //hex__s5: 69 69 69 0D 0A
+            WriteLine("hex_s5a: {0}[..^2] (exp:6969690D)", split_hex_bytes[..^2] ); //hex__s5: 69 69 69 0D [0A}
+            WriteLine("hex_s5b: {0}[..^4] (exp:696969)", split_hex_bytes[..^4] ); //hex__s5:   69 69 69 |  [0D][0A] 
             //WriteLine("hex_s5c: {0}[..^6] (exp:6969)", s5of5_utf8_hex_bytes[..^6] ); //hex__s5: 69 69 
 
 
@@ -268,7 +268,7 @@ partial class Program()
 
     }
 
-    public static byte[] GetHexBytesFromRawBytes(int b_int, byte[] buffer)
+    public static byte[] OLD_GetHexBytesFromRawBytes(int b_int, byte[] buffer)
     {
         string hexy_bytes = Convert.ToHexString(buffer, 0, b_int); // 13 bytes == 26 hex-characters
         WriteLine($"hex_bytes: {hexy_bytes}");
@@ -292,44 +292,62 @@ partial class Program()
         {
             WriteLine("do ping!");
         }
-
+        //"".ToLower()
+        //"".ToUpper()  
         else if (hexy_bytes[..echo_resp_string_id.Length] == "2A320D0A24340D0A4543484F0D0A")
-        {
+        {   //"*2",  "$4",    "ECHO"
             WriteLine("do echo!!! echoo echooo");
-            string[] hexy_splits = hexy_bytes.Split("0D0A", 5);
-            WriteLine($"Splitting: {hexy_bytes}\n(exp: \"2A32\",\"2434\",\"4543484F\",\"2435\",\"61616161610D0A");
+            string[] hexy_splits = hexy_bytes.Split("0D0A", 5); // 2A32,2434,4543484F,2433,6565650D0A,
+            WriteLine($"Splitting: {hexy_bytes}");
+            
+            // confirmed:
+            // two args
+            // - 1st arg: exactly 4-bytes AND 
+
             //foreach (var hex in hexy_splits)
             //{
             //    WriteLine(hex);
-            //    //(exp: "2A32","2434","4543484F","2435","61616161610D0A")
-            //    //(exp:   "*2",  "$4",    "ECHO",  "$5",      "aaaaaD0A")
+            //    //(exp: "2A32", "2434", "4543484F", "2435", "61616161610D0A")
+            //    //(exp: " * 2", " $ 4", " E C H O", " $ 5", " a a a a a0D0A")
+            
             //    //( "*2"        :   resp_1of5_cmd_arraycount
             //    //  "$4"        :   resp_2of5_bulkstr_bytecount
             //    //  "ECHO"      :   resp_3of5_bulkstr_payload
             //    //  "$5"        :   resp_4of5_cmdarg_bytecount
             //    //  "aaaaaD0A"? :   resp_5of5_cmdarg_payload
-
             //}
+            
+             
             string resp_1of5_cmd_arraycount     = hexy_splits[0];
             string resp_2of5_bulkstr_bytecount  = hexy_splits[1];
-            string resp_3of5_bulkstr_payload    = hexy_splits[2];
-            string resp_4of5_cmdarg_bytecount   = hexy_splits[3];
-            string resp_5of5_cmdarg_payload     = hexy_splits[4];
+            string resp_3of5_bulkstr_cmdname    = hexy_splits[2];
+            string resp_4of5_cmdarg_bytecount   = hexy_splits[3]; // [$,byte_count]
+            string resp_5of5_cmdarg_payload     = hexy_splits[4]; //
 
 
+            //resp_3of5_bulkstr_cmdname
 
+            // TEST [resp_4of5_cmdarg_bytecount] e.g $5 == 2435
+            // Validate byte-0 is bulk-string #20
+            //Console.WriteLine($"testing byte-0 echo cmd arg: {resp_4of5_cmdarg_bytecount[0..2]} (exp: 24)");
+
+            // [TEST1] arr[0..2] == 24 == $
+            // [TEST2] arr[2..4] == some numerical value 
 
         }
-
-            // ECHO aaaaa: 
-            // *2\r\n$4\r\nECHO        \r\n   $   5 \r\n aaaaa\r\n
-            // 2A320D0A24340D0A4543484F0D0A   24 35 0D0A 61616161610D0A
-
         return "bro";
     }
 
+    bool IsAscii(string s)
+    {
+        return s.All(c => c <= 127);
+    }
 
 }
+
+// ECHO aaaaa: 
+// *2\r\n$4\r\nECHO        \r\n   $   5 \r\n aaaaa\r\n
+// 2A320D0A24340D0A4543484F0D0A   24 35 0D0A 61616161610D0A
 
 //$ redis-cli PING # The command you implemented in the previous stages
 //PONG
