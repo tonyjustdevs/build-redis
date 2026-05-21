@@ -197,6 +197,7 @@ Create **Feature** Branch `feature`
 - `git push -u origin feature/the-cool-new-feature`
 
 | Prefix      | Meaning               |
+| -| -|
 | `feature/`  | new feature           |
 | `bugfix/`   | bug fix               |
 | `hotfix/`   | urgent production fix |
