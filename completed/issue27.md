@@ -1,6 +1,6 @@
-# ISSUE 23
+# ISSUE 27
 case-insensitive-cmd-processing #24
-- https://github.com/tonyjustdevs/build-redis/issues/24
+- https://github.com/tonyjustdevs/build-redis/issues/27
 
 todo
 - RD1 test ping:
@@ -14,9 +14,7 @@ todo
 |🔄|tba|all lower-case: `ping`|`redis-cli ping`|`PONG`<br>||||
 |🔄|tba| mixed-case: `pIng`|`redis-cli pIng`|`PONG`<br>||||
 
-
-
-# misc stuff below
+Reference
 - ✅ = Completed/PASS
 - ❌ = Failed  
 - ⏳ = In progress/Testing

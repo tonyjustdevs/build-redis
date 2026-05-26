@@ -327,3 +327,7 @@ Examples
 |`port 6969`| only show traffic involving TCP port 6969|
 |`sudo tcpdump -i lo -s 0 -w redis_capture.pcap port 6969`|Write File:<br>- Capture on `loopback`:<br>- if app and Redis are on **same machine**|
 |`sudo tcpdump -i lo -s 0 -w redis_capture.pcap 'port 6969 or port 6379'`|Write File:<br>- Multiple ports|
+
+|`c#` keyboard shortcuts|description|
+|-|-|
+|`ctrl alt j`| find method name|
