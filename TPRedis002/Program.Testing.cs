@@ -26,7 +26,7 @@ partial class Program()
         }
     }
 
-    public static void PrintReqInUTF8(int b_int, byte[] b_arr, bool run = true, bool neat = false)
+    public static void PrintReqInUTF8Old(int b_int, byte[] b_arr, bool run = true, bool neat = false)
     {
         if (run & neat)
         {
@@ -42,7 +42,7 @@ partial class Program()
         }
     }
 
-    public static void PrintHexBytes(int b_int, byte[] buffer, bool run = true)
+    public static void PrintHexBytesOld(int b_int, byte[] buffer, bool run = true)
     {
         if (run)
         {   //2A320D0A24340D0A
@@ -175,7 +175,7 @@ partial class Program()
     }
 
 
-    public static void HandleClient(Socket client)
+    public static void HandleClientOld(Socket client)
     {
         byte[] buffer = new byte[1024];
 
@@ -189,22 +189,29 @@ partial class Program()
             PrintHexBytes(b_int, buffer);
             #endregion
 
+            string? cmd_str;
+            if (!IsItValidRespCmd(buffer, b_int, out cmd_str))
+            {
+                client.Send(Encoding.UTF8.GetBytes("+INVALID\r\n"));
+            }
+            client.Send(Encoding.UTF8.GetBytes("+VALID\r\n"));
+            //ProcessValidCommand(cmd_str);
+            
+            //if (IsItValidPingRespCmd(buffer, b_int)) 
+            //{
+            //    client.Send(Encoding.UTF8.GetBytes("+PONG\r\n"));
+            //}
+            //else if (IsItValidEchoRespCmd(buffer, b_int, out string payload_str))
+            //{
+            //    //client.Send(Encoding.UTF8.GetBytes($"+{payload_str}\r\n"));
+            //    client.Send(Encoding.UTF8.GetBytes($"${payload_str.Length}\r\n{payload_str}\r\n"));
+            //    //$5\r\nhello\r\n
+            //}
+            //else
+            //{
+            //    client.Send(Encoding.UTF8.GetBytes("+BADCMDENDING\r\n"));
 
-            if (IsItValidPingRespCmd(buffer, b_int)) 
-            {
-                client.Send(Encoding.UTF8.GetBytes("+PONG\r\n"));
-            }
-            else if (IsItValidEchoRespCmd(buffer, b_int, out string payload_str))
-            {
-                //client.Send(Encoding.UTF8.GetBytes($"+{payload_str}\r\n"));
-                client.Send(Encoding.UTF8.GetBytes($"${payload_str.Length}\r\n{payload_str}\r\n"));
-                //$5\r\nhello\r\n
-            }
-            else
-            {
-                client.Send(Encoding.UTF8.GetBytes("+BADCMDENDING\r\n"));
-
-            }
+            //}
 
 
 
@@ -281,7 +288,6 @@ partial class Program()
         else
         {
             WriteLine("received definitely not a PING command...ending...");
-            return;
         }
 
             //3.Split `hexy_bytes` by limiter: `0D0A` to:
@@ -324,11 +330,11 @@ partial class Program()
             //10-011
             //Encoding.UTF8.getstr
             //var received_elements = Encoding.UTF8.GetString(hexy_bytes[2..4]);
-            var rec_elmts_str  = Encoding.UTF8.GetString(Convert.FromHexString(hexy_bytes[2..4]));
-            var cmd1_str       = Encoding.UTF8.GetString(Convert.FromHexString(hexy_bytes[10..12]));
+            var rec_elmts_str = Encoding.UTF8.GetString(Convert.FromHexString(hexy_bytes[2..4]));
+            var cmd1_str = Encoding.UTF8.GetString(Convert.FromHexString(hexy_bytes[10..12]));
             //var received_elements = Encoding.UTF8.GetString(hexy_bytes);
             //var cm1_bytes = Encoding.UTF8.GetString(hexy_bytes[10..12]);
-            
+
 
             WriteLine($"MATE YOU ARE CHOPPED: '{rec_elmts_str}' elements & cm1_bytes: '{cmd1_str}'...ending...");
             return false;
@@ -350,20 +356,25 @@ partial class Program()
         // 4 SPLIT-TEST: Expecting hexy_splits to be into 3
 
         foreach (var hexy_split in hexy_splits)
-        {
-            WriteLine($"NOW: {hexy_split}");
+        {   // 2A31 0D0A 2434 0D0A 50494E47 0D0A
+            WriteLine($"NOW: {hexy_split}"); // 2A31 0D0A 2434 0D0A 50494E470 D0A
+            //  NOW: 2A31
+            //  NOW: 2434
+            //  NOW: 50494E47
+            //  NOW:
         }
 
 
-        string hexy_cmd = hexy_splits[2];
+        string hexy_ping_cmd = hexy_splits[2]; // 50494E47 AKA PING
         //    * 1 \r\n $ 4  \r\n
         //   2A31 0D0A 2434 0D0A    whatreverishere_hopefully_a_respcmd0D0A
         //0: 2A31     | 1: 2434 |2: whatreverishere_hopefully_a_respcmd0D0A
         //byte[] cmd_bytes = Convert.FromHexString(hexy_cmd[..8]); // THREE-SPLIT CODE
-        byte[] cmd_bytes = Convert.FromHexString(hexy_cmd); // 4-SPLIT CODE
-        
-        string cmd_str = Encoding.UTF8.GetString(cmd_bytes);
-        WriteLine($"cmd_str : {cmd_str} hex:{Convert.ToHexString(cmd_bytes)}");
+        byte[] cmd_ping_bytes = Convert.FromHexString(hexy_ping_cmd); // 4-SPLIT CODE
+
+
+        string cmd_str = Encoding.UTF8.GetString(cmd_ping_bytes);// bytes -> str -> "ping"
+        WriteLine($"cmd_str : {cmd_str} hex:{Convert.ToHexString(cmd_ping_bytes)}");
         if (cmd_str.ToUpper() == "PING")
         {
             WriteLine("its truly a piiinggggg!!");
@@ -376,7 +387,65 @@ partial class Program()
             //Console.WriteLine($"cmd_sup: {cmd_str.ToUpper()}");
             return false;
         }
+
+        //        [e14][a20]: *1\r\n$4\r\nPING\r\n
+
+        //[e14][a14]:2A310D0A24340D0A50494E470D0A
+
+        //entered IsItValidPingRespCmd()
+        //Confirming 'command' received is a 1 - byte - string of 4 - bytes:
+        //2A310D0A24340D0A
+        //2A310D0A24340D0A
+        //NOW: 2A31
+        //NOW: 2434
+        //NOW: 50494E47
+        //NOW:
+        //    cmd_str: PING hex:50494E47
+        //its truly a piiinggggg!!
     }
+
+
+
+    public static bool IsItValidRespCmdOld(byte[] buffer, int b_int, out string? valid_cmd_str)
+    {
+        WriteLine("\nentered IsItValidRespCmd()");
+
+        string hexy_bytes = Convert.ToHexString(buffer, 0, b_int);
+
+        string cmd_str = Encoding.UTF8.GetString(Convert
+            .FromHexString(hexy_bytes.Split("0D0A", 4)[2]))
+            .ToUpper();
+
+        string arg_str = Encoding.UTF8.GetString(Convert
+        .FromHexString(hexy_bytes.Split("0D0A", 4)[2]))
+        .ToUpper();
+        WriteLine($"cmd_str: {cmd_str}");
+        bool valid_cmd_bool = false;
+        switch (cmd_str)
+        {
+            case "ECHO":
+                WriteLine("'ECHO' cmd received");
+                valid_cmd_str = "ECHO";
+                valid_cmd_bool = true;
+                break;
+            case "PING":
+                WriteLine("'PING' cmd received");
+                valid_cmd_str = "PING";
+                valid_cmd_bool = true;
+                break;
+            default:
+                WriteLine($"'{cmd_str}' IS NOT RECOGNISED!!!"); valid_cmd_str = "PING";
+                //valid_cmd_str = null;
+                break;
+        }
+
+        return valid_cmd_bool;
+        //switc
+        // https://github.com/tonyjustdevs/build-redis/issues/28
+
+    }
+
+
 
     public static bool IsItValidEchoRespCmd(byte[] buffer, int b_int, out string payload_str)
     {
@@ -581,6 +650,8 @@ partial class Program()
     {
         return s.All(c => c <= 127);
     }
+
+
     
 }
             // [case-1] {PING} cmd, No-Arguments

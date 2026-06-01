@@ -13,7 +13,7 @@ partial class Program
     {
         Console.WriteLine("Starting TPRedis002-Server...");
 
-        TcpListener server = new TcpListener(System.Net.IPAddress.Any, 6971);
+        TcpListener server = new TcpListener(System.Net.IPAddress.Any, 6969);
         //TcpListener server = new TcpListener(System.Net.IPAddress.Any, 6379);
         server.Start(); 
         while (true)
