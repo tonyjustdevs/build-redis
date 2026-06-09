@@ -9,6 +9,8 @@ partial class Program
 
     public static void HandleClient(Socket client)
     {
+        Console.WriteLine($"\nClient connected: {client.Connected} [id:{Thread.CurrentThread.ManagedThreadId}]");
+        Thread.Sleep(5000);
         byte[] buffer = new byte[1024];
 
         while (true)
@@ -39,9 +41,10 @@ partial class Program
     }
 
     #region Command Validation
+
     public static bool IsItValidRespCmd(byte[] buffer, int b_int, out string? valid_cmd_str)
     {
-        WriteLine("\nentered IsItValidRespCmd()");
+        WriteLine("- entered IsItValidRespCmd()");
 
         string hexy_bytes = Convert.ToHexString(buffer, 0, b_int);
 
@@ -50,30 +53,36 @@ partial class Program
             .ToUpper();
 
         
-        bool valid_cmd_bool = false;
+        bool valid_cmd_bool = true;
         
-        WriteLine($"cmd_str: {cmd_str}");
+        WriteLine($"- cmd_str: {cmd_str}");
         switch (cmd_str)
         {
             case "ECHO":
-                WriteLine("'ECHO' cmd received");
+                WriteLine("- 'ECHO' cmd received");
                 valid_cmd_str = "ECHO";
-                valid_cmd_bool = true;
                 break;
             case "PING":
-                WriteLine("'PING' cmd received");
+                WriteLine("- 'PING' cmd received");
                 valid_cmd_str = "PING";
-                valid_cmd_bool = true;
                 break;
+            case "SET":
+                WriteLine("- 'SET' cmd received");
+                valid_cmd_str = "SET";
+                break;
+            case "GET":
+                WriteLine("- 'GET' cmd received");
+                valid_cmd_str = "GET";
+                break;
+
             default:
-                WriteLine($"'{cmd_str}' IS NOT RECOGNISED!!!"); valid_cmd_str = "PING";
-                //valid_cmd_str = null;
+                WriteLine($"- '{cmd_str}' IS NOT RECOGNISED!!!");
+                valid_cmd_bool = false;
+                valid_cmd_str = null;
                 break;
         }
 
-        return valid_cmd_bool;
-        //switc
-        // https://github.com/tonyjustdevs/build-redis/issues/28
+        return valid_cmd_bool; // https://github.com/tonyjustdevs/build-redis/issues/28
 
     }
     #endregion
@@ -82,27 +91,83 @@ partial class Program
     public static byte[] ProcessCommandStr(byte[] buffer, int b_int, string? cmd_str) 
     {
         if (cmd_str is null) return [];
-        WriteLine("\nentered ProcessCommandStr('{0}')", cmd_str);
+        WriteLine("- entered ProcessCommandStr('{0}')", cmd_str);
 
         byte[] return_bytes = cmd_str switch
         {
-            "PING" => RunPingCmd(buffer, b_int),
-            "ECHO" => RunEchoCmd(buffer, b_int),
+            "PING"  => RunPingCmd(buffer, b_int),
+            "ECHO"  => RunEchoCmd(buffer, b_int),
+            "SET"   => RunSetCmd(buffer, b_int),
+            "GET"   => RunGetCmd(buffer, b_int),
             _ => []
         };
         
-        WriteLine("\nleaving ProcessCommandStr([{0}]) + ret_hexy_bytes('{1}')", cmd_str, Convert.ToHexString(return_bytes));
+        WriteLine("- leaving ProcessCommandStr([{0}]) + ret_hexy_bytes('{1}')", cmd_str, Convert.ToHexString(return_bytes));
         return return_bytes;
     }
 
     #endregion
 
 
+    #region Command Argument Validation 
+    public static bool isEchoArgValid(string hexy_bytes_4_bytes)
+    {
+        Console.WriteLine($"- First 4 bytes of 'ECHO': {hexy_bytes_4_bytes}");
+        if (hexy_bytes_4_bytes != "2A32") 
+        {
+        Console.WriteLine($"- [BAD] 'ECHO' ARGS");
+            return false;
+        } 
+        Console.WriteLine($"- [OK] 'ECHO' ARGS");
+        return true;
+        
+
+        //WriteLine("hexy_bytes: {0}", hexy_bytes);
+        //WriteLine("strs_bytes: {0}", UTF8Encoding.UTF8.GetString(buffer,0,b_int));
+        // 2A31 0D0A 2434 0D0A 4563686F 0D0A - echo only
+        //  * 1       $ 4       E c h o
+
+            // [2A32] 0D0A [2434] 0D0A [4543484F] 0D0A [24330D0A6969690D0A]
+            // [ * 2]      [ $ 4]      [ E C H O]      [ $ 3 \r\ni i i\r\n]
+            // 0            1           2               3                     4       
+
+            //hexy_bytes == "2A310D0A.." or "2A320D0A.."
+    }
+
+    public static bool isSetArgValid(string hexy_bytes_4_bytes)
+    {
+        Console.WriteLine($"- First 4 bytes of 'SET': {hexy_bytes_4_bytes}");
+        if (hexy_bytes_4_bytes == "2A32")
+        {
+            Console.WriteLine($"- [OK] 'SET' ARGS: 1 CMD AND 1 ARG");
+            return true;
+        }
+        else if (hexy_bytes_4_bytes == "2A31")
+        {
+            Console.WriteLine($"- [BAD] 'SET' ARGS: MISSING VALUE TO SET");
+            return false;
+        }
+        else
+        {
+            Console.WriteLine($"- [BAD] 'SET' ARGS: MORE THAN 1 VALUE PROVIDED");
+            return false;
+        }
+    }
+
+
+    #endregion
+
     #region Command Definitions
     public static byte[] RunEchoCmd(byte[] buffer, int b_int) 
     {
-        WriteLine("\nentered RunEchoCmd()");
+        WriteLine("- entered RunEchoCmd()");
+
         string hexy_bytes = Convert.ToHexString(buffer,0,b_int);
+        if (!isEchoArgValid(hexy_bytes[0..4]))
+        {
+            return Encoding.UTF8.GetBytes("+INVALID\r\n");
+        }
+        
 
         #region debuginfo
         //WriteLine("hexy_bytes: {0}", hexy_bytes);
@@ -124,16 +189,45 @@ partial class Program
         string cmd_payload_hexy_str = hexy_bytes.Split("0D0A", 4)[3];  //$3\r\niii\r\n ---  $3 iii
 
         byte[] return_bytes = Convert.FromHexString(cmd_payload_hexy_str+"0D0A"); // [HEXY_PAYLOAD_STR] ---> [RAW_BYTES]
-        WriteLine("\nleaving RunEchoCmd() + ret_hexy_bytes('{0}')", Convert.ToHexString(return_bytes));
+        WriteLine("- leaving RunEchoCmd() + ret_hexy_bytes('{0}')", Convert.ToHexString(return_bytes));
         return return_bytes;
     }
 
     public static byte[] RunPingCmd(byte[] buffer, int b_int) 
     {
-        WriteLine("\nentered RunPingCmd()");
-        WriteLine("\nleaving RunPingCmd()");
+        WriteLine("- entered RunPingCmd()");
+        WriteLine("- leaving RunPingCmd()");
         return Encoding.UTF8.GetBytes("+PONG\r\n");
     }
+
+
+    public static byte[] RunSetCmd(byte[] buffer, int b_int)
+    {
+        WriteLine("- entered RunSetCmd()");
+
+        string hexy_bytes = Convert.ToHexString(buffer, 0, b_int);
+        if (!isSetArgValid(hexy_bytes[0..4]))
+        {
+            return Encoding.UTF8.GetBytes("+INVALID\r\n");
+        }
+
+
+        #region debuginfo
+        WriteLine("hexy_bytes: {0}", hexy_bytes);
+        WriteLine("strs_bytes: {0}", UTF8Encoding.UTF8.GetString(buffer, 0, b_int));
+        // hexy_bytes: "2A32 0D0A 2433 0D0A 736574 0D0A 2433 0D0A 62726F0 D0A"
+        // strs_bytes: " * 2       $ 3       s e t       $ 3        b r o    "
+        #endregion
+
+        //string cmd_payload_hexy_str = hexy_bytes.Split("0D0A", 4)[3];  //$3\r\niii\r\n ---  $3 iii
+        //byte[] return_bytes = Convert.FromHexString(cmd_payload_hexy_str + "0D0A"); // [HEXY_PAYLOAD_STR] ---> [RAW_BYTES]
+        //WriteLine("- leaving RunSetCmd() + ret_hexy_bytes('{0}')", Convert.ToHexString(return_bytes));
+        WriteLine("- leaving RunSetCmd()...");
+        return [];
+    }
+    public static byte[] RunGetCmd(byte[] buffer, int b_int) { return []; }
+
+
     #endregion
 
 
@@ -143,14 +237,14 @@ partial class Program
         if (run & neat)
         {
             string utf8str = Encoding.UTF8.GetString(b_arr, 0, b_int);
-            WriteLine("\n[e{0}][a{2}]:\n'{1}'", b_int, utf8str, utf8str.Length);
+            WriteLine("-  [e{0}][a{2}]:\n'{1}'", b_int, utf8str, utf8str.Length);
         }
 
         if (run & !neat)
         {
             string utf9str = Encoding.UTF8.GetString(b_arr, 0, b_int)
                 .Replace("\r", "\\r").Replace("\n", "\\n");
-            WriteLine("\n[e{0}][a{2}]: {1}", b_int, utf9str, utf9str.Length);
+            WriteLine("- [e{0}][a{2}]: {1}", b_int, utf9str, utf9str.Length);
         }
     }
 
@@ -159,7 +253,7 @@ partial class Program
         if (run)
         {   //2A320D0A24340D0A
             string hex_str = Convert.ToHexString(buffer, 0, b_int);
-            WriteLine("\n[e{0}][a{2}]:{1}", b_int, hex_str, hex_str.Length / 2);
+            WriteLine("- [e{0}][a{2}]:{1}", b_int, hex_str, hex_str.Length / 2);
         }
     }
     #endregion
