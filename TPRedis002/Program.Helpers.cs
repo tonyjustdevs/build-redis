@@ -156,6 +156,27 @@ partial class Program
         }
     }
 
+    public static bool isGetArgValid(string hexy_bytes_4_bytes)
+    {   // *2\r\n$3\r\nGET\r\n$3\r\ncat\r\n 
+        Console.WriteLine($"- First 4 bytes of 'SET': {hexy_bytes_4_bytes} (*3)");
+        //if (hexy_bytes_4_bytes == "2A32")
+        if (hexy_bytes_4_bytes == "2A32") // 33 - 3, 32 - 2, 31 - 1, 30 - 1
+        {   //2A == * , 32 = 2 AKA 2-EL-ARR BC [GET] + [KEY]
+            Console.WriteLine($"- [OK] 2-ELEMENT-ARRAY: 1 CMD + 1 ARG (EXP: 2 EL-ARR");
+            return true;
+        }
+        //else if (hexy_bytes_4_bytes == "2A32")
+        //{
+        //    Console.WriteLine($"- [BAD] 2-ELEMENT-ARRAY: 1 CMD + 1 ARG (EXP: 3 EL-ARR");
+        //    return false;
+        //}
+        else
+        {
+            Console.WriteLine($"- [BAD] NON-3-ELEMENT-ARRAY: (EXP: 2 EL-ARR");
+            return false;
+        }
+    }
+
 
     #endregion
 
@@ -259,7 +280,30 @@ partial class Program
         //WriteLine("- leaving RunSetCmd()...");
         return return_bytes;
     }
-    public static byte[] RunGetCmd(byte[] buffer, int b_int) { return []; }
+    public static byte[] RunGetCmd(byte[] buffer, int b_int) {
+
+        // get utf-8
+
+        WriteLine("- entered RunGetCmd()");
+
+        //string hexy_bytes = Convert.ToHexString(buffer, 0, b_int);
+        string hexy = System.Convert.ToHexString(buffer,0, b_int);
+        string utf8 = UTF8Encoding.UTF8.GetString(buffer, 0, b_int);
+        if (!isGetArgValid(hexy[0..4])) // CHECKS IF IT IS 3 ELEMENT ARRAY AS EXPECTED
+        {
+            return Encoding.UTF8.GetBytes("+INVALID\r\n");
+        }
+        //string hexy = System.Convert.ToHexString(buffer,0, b_int);
+        // 2A32 0D0A 2433 0D0A 474554 0D0 A2433 0D0A 636174 0D0A
+
+        WriteLine($"get_hexy: {hexy}");
+        WriteLine($"get_utf8: {utf8} (exp: *2\r\n$3\r\nget\r\n$3\r\ncat)");
+        //                         actual: *2\r\n$3\r\nGET\r\n$3\r\ncat
+        //UTF8Encoding.UTF8.GetString(buffer, b_int)
+
+        return []; 
+    
+    }
 
 
     #endregion
