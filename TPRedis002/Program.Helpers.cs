@@ -307,6 +307,7 @@ partial class Program
 
         WriteLine($"- get_hexy: {hexy}"); // actual: *2\r\n$3\r\nGET\r\n$3\r\ncat
         string get_key_hexy = hexy.Split("0D0A", 6)[4];
+        //string get_keylen_hexy = hexy.Split("0D0A", 6)[3]; // 2433 or $3
 
         WriteLine($"- get_key_hexy: {get_key_hexy}");
         byte[] key_bytes = System.Convert.FromHexString(get_key_hexy);
@@ -330,9 +331,23 @@ partial class Program
         //WriteLine($"- hexy_get_val_rn: {"+"hexy_get_val+"0D0A"}");
         //byte[] return_bytes = System.Convert.FromHexString("+"+hexy_get_val+"0D0A");
 
-        byte[] return_bytes = Encoding.UTF8.GetBytes("+tempOK\r\n");
         // Encoding.UTF8.GetBytes("+tempOK\r\n");
         //resp_keys_global_dict[636174]: '69696969'
+
+        //`$3\r\nbar\r\n`
+        // "$N"
+        //"2A" + hex of (int)hexy_get_val
+        //
+        //string get_vallen_hexy;
+        //string return_hex = get_vallen_hexy+"0D0A"+hexy_get_val+"0D0A"; // 2433 or $3
+        //  $ 3  \r\n     bar        \r\n
+        int hexy_get_val_len= hexy_get_val.Length;
+        WriteLine($"- hexy_get_val_len: {hexy_get_val_len}");
+        /// convert [hex_str] to [bytes] to [utf8], then to [bytes]
+        //byte[] return_bytes =  Convert.FromHexString(return_hex);
+
+        //byte[] return_bytes = Encoding.UTF8.GetBytes(return_hex);
+        byte[] return_bytes = Encoding.UTF8.GetBytes("+TESTOK");
         return return_bytes;
 
     }

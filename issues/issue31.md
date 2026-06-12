@@ -12,4 +12,4 @@
 
 todo
 - [ ] `redis-cli -p 6969 GET <ExistingKey>`
-- [ ] confirm `GetCmd()` executed with test print
+- [ ] confirm `GetCmd()` executed with test print`
