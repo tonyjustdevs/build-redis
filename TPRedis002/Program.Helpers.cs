@@ -294,12 +294,15 @@ partial class Program
             return Encoding.UTF8.GetBytes("+INVALID\r\n");
         }
         //string hexy = System.Convert.ToHexString(buffer,0, b_int);
-        // 2A32 0D0A 2433 0D0A 474554 0D0 A2433 0D0A 636174 0D0A
+        // 2A32 0D0A 2433 0D0A 474554 0D0A 2433 0D0A 636174 0D0A
+        //   *2 \r\n  $ 3 \r\n  G E T \r\n  $ 3  \r\n c a t \r\n 
 
-        WriteLine($"get_hexy: {hexy}");
-        WriteLine($"get_utf8: {utf8} (exp: *2\r\n$3\r\nget\r\n$3\r\ncat)");
-        //                         actual: *2\r\n$3\r\nGET\r\n$3\r\ncat
-        //UTF8Encoding.UTF8.GetString(buffer, b_int)
+        //WriteLine($"- get_utf8: {utf8} (exp: *2\\r\\n$3\\r\\nget\\r\\n$3\\r\\ncat)");
+        WriteLine($"- get_hexy: {hexy}"); // actual: *2\r\n$3\r\nGET\r\n$3\r\ncat
+        string get_key_hexy = hexy.Split("0D0A", 6)[4];
+        WriteLine($"- get_key_hexy: {get_key_hexy}");
+        byte[] key_bytes =System.Convert.FromHexString(get_key_hexy);
+        WriteLine($"- get_key_utf8: {UTF8Encoding.UTF8.GetString(key_bytes)}");
 
         return []; 
     
