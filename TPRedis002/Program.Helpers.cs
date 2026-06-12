@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net.Sockets;
 using System.Text;
@@ -10,7 +11,7 @@ partial class Program
     public static void HandleClient(Socket client)
     {
         Console.WriteLine($"\nClient connected: {client.Connected} [id:{Thread.CurrentThread.ManagedThreadId}]");
-        Thread.Sleep(5000);
+        //Thread.Sleep(5000);
         byte[] buffer = new byte[1024];
 
         while (true)
@@ -100,7 +101,7 @@ partial class Program
             "SET"   => RunSetCmd(buffer, b_int),
             "GET"   => RunGetCmd(buffer, b_int),
             _ => []
-        };
+        };      
         
         WriteLine("- leaving ProcessCommandStr([{0}]) + ret_hexy_bytes('{1}')", cmd_str, Convert.ToHexString(return_bytes));
         return return_bytes;
@@ -136,20 +137,21 @@ partial class Program
 
     public static bool isSetArgValid(string hexy_bytes_4_bytes)
     {
-        Console.WriteLine($"- First 4 bytes of 'SET': {hexy_bytes_4_bytes}");
-        if (hexy_bytes_4_bytes == "2A32")
+        Console.WriteLine($"- First 4 bytes of 'SET': {hexy_bytes_4_bytes} (*3)");
+        //if (hexy_bytes_4_bytes == "2A32")
+        if (hexy_bytes_4_bytes == "2A33") // 33 - 3, 32 - 2, 31 - 1, 30 - 1
         {
-            Console.WriteLine($"- [OK] 'SET' ARGS: 1 CMD AND 1 ARG");
+            Console.WriteLine($"- [OK] 3-ELEMENT-ARRAY: 1 CMD + 2 ARG (EXP: 3 EL-ARR");
             return true;
         }
-        else if (hexy_bytes_4_bytes == "2A31")
+        else if (hexy_bytes_4_bytes == "2A32")
         {
-            Console.WriteLine($"- [BAD] 'SET' ARGS: MISSING VALUE TO SET");
+            Console.WriteLine($"- [BAD] 2-ELEMENT-ARRAY: 1 CMD + 1 ARG (EXP: 3 EL-ARR");
             return false;
         }
         else
         {
-            Console.WriteLine($"- [BAD] 'SET' ARGS: MORE THAN 1 VALUE PROVIDED");
+            Console.WriteLine($"- [BAD] NON-3-ELEMENT-ARRAY: (EXP: 3 EL-ARR");
             return false;
         }
     }
@@ -206,24 +208,56 @@ partial class Program
         WriteLine("- entered RunSetCmd()");
 
         string hexy_bytes = Convert.ToHexString(buffer, 0, b_int);
-        if (!isSetArgValid(hexy_bytes[0..4]))
-        {
-            return Encoding.UTF8.GetBytes("+INVALID\r\n");
+        if (!isSetArgValid(hexy_bytes[0..4])) // CHECKS IF IT IS 3 ELEMENT ARRAY AS EXPECTED
+            {
+                return Encoding.UTF8.GetBytes("+INVALID\r\n");
         }
 
+        //- [e34][a48]:  * 3 \r\n  $ 3 \r\n  S E T \r\n  $ 3 \r\n  f o o \r\n  $ 6 \r\n  b a r b a r \r\n
+        //- [e34][a34]: 2A33 0D0A 2433 0D0A 534554 0D0A 2433 0D0A 666F6F 0D0A 2436 0D0A 626172626172 0D0A
 
         #region debuginfo
-        WriteLine("hexy_bytes: {0}", hexy_bytes);
-        WriteLine("strs_bytes: {0}", UTF8Encoding.UTF8.GetString(buffer, 0, b_int));
-        // hexy_bytes: "2A32 0D0A 2433 0D0A 736574 0D0A 2433 0D0A 62726F0 D0A"
-        // strs_bytes: " * 2       $ 3       s e t       $ 3        b r o    "
+        WriteLine("- hexy_bytes: {0}", hexy_bytes);
+        WriteLine("- strs_bytes: {0}", UTF8Encoding.UTF8.GetString(buffer, 0, b_int)); // *3
         #endregion
 
-        //string cmd_payload_hexy_str = hexy_bytes.Split("0D0A", 4)[3];  //$3\r\niii\r\n ---  $3 iii
+        //string cmd_payload_hexy_str = hexy_bytes.Split("0D0A", 1)[0];  //$3\r\niii\r\n ---  $3 iii
+        string[] cmd_payload_hexy_str = hexy_bytes.Split("0D0A", 8);  //$3\r\niii\r\n ---  $3 iii
+
+        //for (int i = 0; i < cmd_payload_hexy_str.Length; i++)
+        //{
+        //    WriteLine($"- [{i}]: '{cmd_payload_hexy_str[i]}'") ;
+        //}
+        //- [0]: '2A33'     *3
+        //- [1]: '2433'     $3
+        //- [2]: '534554'   SET
+        //- [3]: '2433'     $3      ---- len of 'key' payload: hexy[3] is the KEY == $3 is bulkstring+size: capture 3rd to end ie [3..]
+        //- [4]: '666F6F'   foo     ---- acutal 'key' payload
+        //- [5]: '2433'     $3      ---- len of 'val'
+        //- [6]: '626172'   $bar    ---- actual 'val' payload
+        //- [7]: ''
+
+        // capture KEY
+
+        string set_key_payload = cmd_payload_hexy_str[4]; // this is len of payload
+        string set_val_payload = cmd_payload_hexy_str[6]; // this is len of payload
+        
+        WriteLine($"- key_payload: {set_key_payload}");
+        WriteLine($"- val_payload: {set_val_payload}");
+
+        Dictionary<string, string> resp_keys_dict = new Dictionary<string,string>();
+        //resp_keys_dict.Add(set_key_payload, "test_val"); // test val
+        resp_keys_dict.Add(set_key_payload, set_val_payload);
+        WriteLine($"- get_resp_keys_dict[{set_key_payload}]: '{resp_keys_dict[set_key_payload]}'");
+
+
+        byte[] return_bytes = UTF8Encoding.UTF8.GetBytes("+OK\r\n");
+
+        //byte[] return_bytes = Convert.FromHexString("0D0A"); // [HEXY_PAYLOAD_STR] ---> [RAW_BYTES]
         //byte[] return_bytes = Convert.FromHexString(cmd_payload_hexy_str + "0D0A"); // [HEXY_PAYLOAD_STR] ---> [RAW_BYTES]
-        //WriteLine("- leaving RunSetCmd() + ret_hexy_bytes('{0}')", Convert.ToHexString(return_bytes));
-        WriteLine("- leaving RunSetCmd()...");
-        return [];
+        WriteLine("- leaving RunSetCmd() + ret_hexy_bytes('{0}')", Convert.ToHexString(return_bytes));
+        //WriteLine("- leaving RunSetCmd()...");
+        return return_bytes;
     }
     public static byte[] RunGetCmd(byte[] buffer, int b_int) { return []; }
 
