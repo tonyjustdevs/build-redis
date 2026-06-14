@@ -217,7 +217,8 @@ partial class Program
         //string cmd_payload_hexy_str = hexy_bytes.Split("0D0A", 5)[3]; //24330D0A696969 ---  $3 iii
         string cmd_payload_hexy_str = hexy_bytes.Split("0D0A", 4)[3];  //$3\r\niii\r\n ---  $3 iii
 
-        byte[] return_bytes = Convert.FromHexString(cmd_payload_hexy_str+"0D0A"); // [HEXY_PAYLOAD_STR] ---> [RAW_BYTES]
+        //byte[] return_bytes = Convert.FromHexString(cmd_payload_hexy_str+"0D0A"); // [HEXY_PAYLOAD_STR] ---> [RAW_BYTES]
+        byte[] return_bytes = Convert.FromHexString(cmd_payload_hexy_str); // bugfix #51 https://github.com/tonyjustdevs/build-redis/issues/51
         WriteLine("- leaving RunEchoCmd() + ret_hexy_bytes('{0}')", Convert.ToHexString(return_bytes));
         return return_bytes;
     }
