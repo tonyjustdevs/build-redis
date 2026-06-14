@@ -318,15 +318,25 @@ partial class Program
         string get_dict_hexy_val = resp_keys_global_dict[get_key_hexy];
         WriteLine($"- [RunGetCmd()] resp_keys_global_dict[{get_key_hexy}]: '{get_dict_hexy_val}'");
         byte[] get_dict_bytes = System.Convert.FromHexString(get_dict_hexy_val);
-        var get_dict_utf8 = Encoding.UTF8.GetString(get_dict_bytes);
+        var get_val_utf8 = Encoding.UTF8.GetString(get_dict_bytes);
 
-        WriteLine($"- [RunGetCmd()] get_dict_utf8: '{get_dict_utf8}' (exp: iiiii)");
+        WriteLine($"- [RunGetCmd()] get_val_utf8: '{get_val_utf8}' (exp: iiiii)");
+        int get_val_utf8_len = get_val_utf8.Length;
+        WriteLine($"- [RunGetCmd()] get_val_utf8_len: '{get_val_utf8_len}' (exp: 6)");
+        //get_dict_utf8.
         //[RunGetCmd()] get_dict_utf8: 'iiiii'(exp: iiiii)  
         // #45 https://github.com/tonyjustdevs/build-redis/issues/45
         // convert {resp_keys_global_dict[set_key_payload]} '69696969' back to 'iiiii' (hexy -> utf8)
 
 
         //byte[] return_bytes = Encoding.UTF8.GetBytes(return_hex);
+
+
+        //*1 \r\n  $ 3 \r\n i i i \r\n
+        var return_utf8 = $"*1\r\n${get_val_utf8_len}\r\n{get_val_utf8}\r\n";
+        //#46 build server resp response https://github.com/tonyjustdevs/build-redis/issues/46
+        WriteLine($"return_utf8: {return_utf8} (exp: '*1\\r\\n$5\\r\\niiiii\\r\\n'");
+
         byte[] return_bytes = Encoding.UTF8.GetBytes("+TESTOK");
         return return_bytes;
 
