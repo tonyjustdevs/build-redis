@@ -333,11 +333,14 @@ partial class Program
 
 
         //*1 \r\n  $ 3 \r\n i i i \r\n
-        var return_utf8 = $"*1\r\n${get_val_utf8_len}\r\n{get_val_utf8}\r\n";
+        //var return_utf8 = $"*1\r\n${get_val_utf8_len}\r\n{get_val_utf8}\r\n";// incorrectly array
+        var return_utf8 = $"${get_val_utf8_len}\r\n{get_val_utf8}\r\n"; // only bulkstring required
         //#46 build server resp response https://github.com/tonyjustdevs/build-redis/issues/46
-        WriteLine($"return_utf8: {return_utf8} (exp: '*1\\r\\n$5\\r\\niiiii\\r\\n'");
+        //WriteLine($"return_utf8: {return_utf8} (exp: '*1\\r\\n$5\\r\\niiiii\\r\\n'"); // wrong
+        WriteLine($"return_utf8: {return_utf8} (exp: '$6\\r\\niiiiii\\r\\n'");
 
-        byte[] return_bytes = Encoding.UTF8.GetBytes("+TESTOK");
+        //byte[] return_bytes = Encoding.UTF8.GetBytes("+TESTOK");
+        byte[] return_bytes = Encoding.UTF8.GetBytes(return_utf8);
         return return_bytes;
 
     }
