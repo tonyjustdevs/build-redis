@@ -164,11 +164,11 @@ partial class Program
 
     public static bool isGetArgValid(string hexy_bytes_4_bytes)
     {   // *2\r\n$3\r\nGET\r\n$3\r\ncat\r\n 
-        Console.WriteLine($"- First 4 bytes of 'GET': {hexy_bytes_4_bytes} (*3)");
+        Console.WriteLine($"- [isGetArgValid()] First 4 bytes of 'GET': {hexy_bytes_4_bytes} (*3)");
         //if (hexy_bytes_4_bytes == "2A32")
         if (hexy_bytes_4_bytes == "2A32") // 33 - 3, 32 - 2, 31 - 1, 30 - 1
         {   //2A == * , 32 = 2 AKA 2-EL-ARR BC [GET] + [KEY]
-            Console.WriteLine($"- [OK] 2-ELEMENT-ARRAY: 1 CMD + 1 ARG (EXP: 2 EL-ARR");
+            Console.WriteLine($"- [isGetArgValid()] [OK] 2-ELEMENT-ARRAY: 1 CMD + 1 ARG (EXP: 2 EL-ARR");
             return true;
         }
         //else if (hexy_bytes_4_bytes == "2A32")
@@ -178,7 +178,7 @@ partial class Program
         //}
         else
         {
-            Console.WriteLine($"- [BAD] NON-3-ELEMENT-ARRAY: (EXP: 2 EL-ARR");
+            Console.WriteLine($"- [isGetArgValid()] [BAD] NON-3-ELEMENT-ARRAY: (EXP: 2 EL-ARR");
             return false;
         }
     }
@@ -293,7 +293,7 @@ partial class Program
     
     public static byte[] RunGetCmd(byte[] buffer, int b_int)
     {
-        WriteLine("- entered RunGetCmd()");
+        WriteLine("- [RunGetCmd()] entered RunGetCmd()");
 
         string hexy = System.Convert.ToHexString(buffer,0, b_int);
         string utf8 = UTF8Encoding.UTF8.GetString(buffer, 0, b_int);
@@ -305,14 +305,14 @@ partial class Program
         // 2A32 0D0A 2433 0D0A 474554 0D0A 2433 0D0A 636174 0D0A
         //   *2 \r\n  $ 3 \r\n  G E T \r\n  $ 3  \r\n c a t \r\n 
 
-        WriteLine($"- get_hexy: {hexy}"); // actual: *2\r\n$3\r\nGET\r\n$3\r\ncat
+        WriteLine($"- [RunGetCmd()] get_hexy: {hexy}"); // actual: *2\r\n$3\r\nGET\r\n$3\r\ncat
         string get_key_hexy = hexy.Split("0D0A", 6)[4];
         //string get_keylen_hexy = hexy.Split("0D0A", 6)[3]; // 2433 or $3
 
-        WriteLine($"- get_key_hexy: {get_key_hexy}");
+        WriteLine($"- [RunGetCmd()] get_key_hexy: {get_key_hexy}");
         byte[] key_bytes = System.Convert.FromHexString(get_key_hexy);
 
-        WriteLine($"- get_key_utf8: {UTF8Encoding.UTF8.GetString(key_bytes)}");
+        WriteLine($"- [RunGetCmd()] get_key_utf8: {UTF8Encoding.UTF8.GetString(key_bytes)}");
 
         //if (resp_keys_global_dict.ContainsKey(get_key_hexy) == true)
         //{
@@ -324,7 +324,7 @@ partial class Program
             
         //}
 
-        WriteLine($"- resp_keys_global_dict[{get_key_hexy}]: '{resp_keys_global_dict[get_key_hexy]}'");
+        WriteLine($"- [RunGetCmd()] resp_keys_global_dict[{get_key_hexy}]: '{resp_keys_global_dict[get_key_hexy]}'");
         string hexy_get_val = resp_keys_global_dict[get_key_hexy];
         //while(hexy_get_val)
         //WriteLine($"- hexy_get_val: {hexy_get_val}");
@@ -341,8 +341,14 @@ partial class Program
         //string get_vallen_hexy;
         //string return_hex = get_vallen_hexy+"0D0A"+hexy_get_val+"0D0A"; // 2433 or $3
         //  $ 3  \r\n     bar        \r\n
-        int hexy_get_val_len= hexy_get_val.Length;
-        WriteLine($"- hexy_get_val_len: {hexy_get_val_len}");
+        //string hexy_get_val_len= $"{hexy_get_val.Length}";
+
+
+        byte[] get_val_len_utf8= UTF8Encoding.UTF8.GetBytes($"{hexy_get_val.Length}");
+        string get_val_len_hexy = System.Convert.ToHexString(get_val_len_utf8);
+        WriteLine($"- [RunGetCmd()] get_val_len_ints: {hexy_get_val.Length}");
+        WriteLine($"- [RunGetCmd()] get_val_len_hexy: {get_val_len_hexy}");
+
         /// convert [hex_str] to [bytes] to [utf8], then to [bytes]
         //byte[] return_bytes =  Convert.FromHexString(return_hex);
 
