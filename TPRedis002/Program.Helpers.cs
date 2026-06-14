@@ -275,7 +275,8 @@ partial class Program
 
         //resp_keys_dict.Add(set_key_payload, "test_val"); // test val
         resp_keys_global_dict.TryAdd(set_key_payload, set_val_payload);
-        WriteLine($"- resp_keys_global_dict[{set_key_payload}]: '{resp_keys_global_dict[set_key_payload]}'");
+        string get_dict_hexy_val = resp_keys_global_dict[set_key_payload];
+        WriteLine($"- resp_keys_global_dict[{set_key_payload}]: '{get_dict_hexy_val}'");
 
         if (resp_keys_global_dict?.ContainsKey(set_key_payload) == true)
         {
@@ -309,48 +310,21 @@ partial class Program
         string get_key_hexy = hexy.Split("0D0A", 6)[4];
         //string get_keylen_hexy = hexy.Split("0D0A", 6)[3]; // 2433 or $3
 
-        WriteLine($"- [RunGetCmd()] get_key_hexy: {get_key_hexy}");
+        WriteLine($"- [RunGetCmd()] get_key_hexy: '{get_key_hexy}'");
         byte[] key_bytes = System.Convert.FromHexString(get_key_hexy);
 
-        WriteLine($"- [RunGetCmd()] get_key_utf8: {UTF8Encoding.UTF8.GetString(key_bytes)}");
+        WriteLine($"- [RunGetCmd()] get_key_utf8: '{UTF8Encoding.UTF8.GetString(key_bytes)}'");
 
-        //if (resp_keys_global_dict.ContainsKey(get_key_hexy) == true)
-        //{
-        //    WriteLine($"gdict[636174]: {resp_keys_global_dict["636174"]}");
-        //}
-        //else
-        //{
-        //    WriteLine($"gdict count: {resp_keys_global_dict.Count()}");
-            
-        //}
+        string get_dict_hexy_val = resp_keys_global_dict[get_key_hexy];
+        WriteLine($"- [RunGetCmd()] resp_keys_global_dict[{get_key_hexy}]: '{get_dict_hexy_val}'");
+        byte[] get_dict_bytes = System.Convert.FromHexString(get_dict_hexy_val);
+        var get_dict_utf8 = Encoding.UTF8.GetString(get_dict_bytes);
 
-        WriteLine($"- [RunGetCmd()] resp_keys_global_dict[{get_key_hexy}]: '{resp_keys_global_dict[get_key_hexy]}'");
-        string hexy_get_val = resp_keys_global_dict[get_key_hexy];
-        //while(hexy_get_val)
-        //WriteLine($"- hexy_get_val: {hexy_get_val}");
-        //WriteLine($"- hexy_get_val_rn: {"+"hexy_get_val+"0D0A"}");
-        //byte[] return_bytes = System.Convert.FromHexString("+"+hexy_get_val+"0D0A");
+        WriteLine($"- [RunGetCmd()] get_dict_utf8: '{get_dict_utf8}' (exp: iiiii)");
+        //[RunGetCmd()] get_dict_utf8: 'iiiii'(exp: iiiii)  
+        // #45 https://github.com/tonyjustdevs/build-redis/issues/45
+        // convert {resp_keys_global_dict[set_key_payload]} '69696969' back to 'iiiii' (hexy -> utf8)
 
-        // Encoding.UTF8.GetBytes("+tempOK\r\n");
-        //resp_keys_global_dict[636174]: '69696969'
-
-        //`$3\r\nbar\r\n`
-        // "$N"
-        //"2A" + hex of (int)hexy_get_val
-        //
-        //string get_vallen_hexy;
-        //string return_hex = get_vallen_hexy+"0D0A"+hexy_get_val+"0D0A"; // 2433 or $3
-        //  $ 3  \r\n     bar        \r\n
-        //string hexy_get_val_len= $"{hexy_get_val.Length}";
-
-
-        byte[] get_val_len_utf8= UTF8Encoding.UTF8.GetBytes($"{hexy_get_val.Length}");
-        string get_val_len_hexy = System.Convert.ToHexString(get_val_len_utf8);
-        WriteLine($"- [RunGetCmd()] get_val_len_ints: {hexy_get_val.Length}");
-        WriteLine($"- [RunGetCmd()] get_val_len_hexy: {get_val_len_hexy}");
-
-        /// convert [hex_str] to [bytes] to [utf8], then to [bytes]
-        //byte[] return_bytes =  Convert.FromHexString(return_hex);
 
         //byte[] return_bytes = Encoding.UTF8.GetBytes(return_hex);
         byte[] return_bytes = Encoding.UTF8.GetBytes("+TESTOK");
