@@ -147,17 +147,17 @@ partial class Program
         //if (hexy_bytes_4_bytes == "2A32")
         if (hexy_bytes_4_bytes == "2A33") // 33 - 3, 32 - 2, 31 - 1, 30 - 1
         {
-            Console.WriteLine($"- [OK] 3-ELEMENT-ARRAY: 1 CMD + 2 ARG (EXP: 3 EL-ARR");
+            Console.WriteLine($"- [OK] 3-ELEMENT-ARRAY: 1 CMD + 2 ARG (EXP: 3 or 5 EL-ARR");
             return true;
-        }
-        else if (hexy_bytes_4_bytes == "2A32")
+        }// First 4 bytes of 'SET': 2A35 (*3)
+        else if (hexy_bytes_4_bytes == "2A35")
         {
-            Console.WriteLine($"- [BAD] 2-ELEMENT-ARRAY: 1 CMD + 1 ARG (EXP: 3 EL-ARR");
-            return false;
+            Console.WriteLine($"- [OK] 5-ELEMENT-ARRAY: 1 CMD + 4 ARG (EXP: 3 or 5 EL-ARR");
+            return true;
         }
         else
         {
-            Console.WriteLine($"- [BAD] NON-3-ELEMENT-ARRAY: (EXP: 3 EL-ARR");
+            Console.WriteLine($"- [BAD] NON-3-or-5-ELEMENT-ARRAY: (EXP: 3 or 5 EL-ARR");
             return false;
         }
     }
