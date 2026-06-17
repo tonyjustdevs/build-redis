@@ -78,6 +78,10 @@ partial class Program
                 WriteLine("- 'SET' cmd received");
                 valid_cmd_str = "SET";
                 break;
+            case "SET2":
+                WriteLine("- 'SET2' cmd received");
+                valid_cmd_str = "SET2";
+                break;
             case "GET":
                 WriteLine("- 'GET' cmd received");
                 valid_cmd_str = "GET";
@@ -106,6 +110,7 @@ partial class Program
             "PING"  => RunPingCmd(buffer, b_int),
             "ECHO"  => RunEchoCmd(buffer, b_int),
             "SET"   => RunSetCmd(buffer, b_int),
+            "SET2"   => RunSetCmd2(buffer, b_int),
             "GET"   => RunGetCmd(buffer, b_int),
             _ => []
         };      
@@ -266,8 +271,8 @@ partial class Program
 
         // capture KEY
 
-        string set_key_payload = cmd_payload_hexy_str[4]; // this is len of payload
-        string set_val_payload = cmd_payload_hexy_str[6]; // this is len of payload
+        string set_key_payload = cmd_payload_hexy_str[4]; 
+        string set_val_payload = cmd_payload_hexy_str[6]; 
         
         WriteLine($"- key_payload: {set_key_payload}");
         WriteLine($"- val_payload: {set_val_payload}");
@@ -292,7 +297,76 @@ partial class Program
         //WriteLine("- leaving RunSetCmd()...");
         return return_bytes;
     }
-    
+
+
+    public static byte[] RunSetCmd2(byte[] buffer, int b_int)
+    {
+        WriteLine("- entered RunSetCmd2()");
+
+        string hexy_bytes = Convert.ToHexString(buffer, 0, b_int);
+        if (!isSetArgValid(hexy_bytes[0..4])) // CHECKS IF IT IS 3 ELEMENT ARRAY AS EXPECTED
+        {
+            return Encoding.UTF8.GetBytes("+INVALID\r\n");
+        }
+        //- [e34][a48]:  * 3 \r\n  $ 3 \r\n  S E T \r\n  $ 3 \r\n  f o o \r\n  $ 6 \r\n  b a r b a r \r\n
+        //- [e34][a34]: 2A33 0D0A 2433 0D0A 534554 0D0A 2433 0D0A 666F6F 0D0A 2436 0D0A 626172626172 0D0A
+
+        #region debuginfo
+        WriteLine("- hexy_bytes: {0}", hexy_bytes);
+        WriteLine("- strs_bytes: {0}", UTF8Encoding.UTF8.GetString(buffer, 0, b_int)); // *3
+        #endregion
+
+        //string cmd_payload_hexy_str = hexy_bytes.Split("0D0A", 1)[0];  //$3\r\niii\r\n ---  $3 iii
+        //string[] cmd_payload_hexy_str = hexy_bytes.Split("0D0A", 8);  //$3\r\niii\r\n ---  $3 iii
+        string[] cmd_payload_hexy_str = hexy_bytes.Split("0D0A", 11);  //$3\r\niii\r\n ---  $3 iii
+        
+        //for (int i = 0; i < cmd_payload_hexy_str.Length; i++)
+        //{
+        //    WriteLine($"- [{i}]: '{cmd_payload_hexy_str[i]}'") ;
+        //}
+        //- [0]: '2A33'     *3
+        //- [1]: '2433'     $3
+        //- [2]: '534554'   SET
+        //- [3]: '2433'     $3      ---- len of 'key' payload: hexy[3] is the KEY == $3 is bulkstring+size: capture 3rd to end ie [3..]
+        //- [4]: '666F6F'   foo     ---- acutal 'key' payload
+        //- [5]: '2433'     $3      ---- len of 'val'
+        //- [6]: '626172'   bar     ---- actual 'val' payload
+        //- [7]: '2A32'     $2      ---- len millisecond param expiry
+        //- [8]: '5058'     PX      ---- px == ms param expiry
+        //- [9]: '243e'     $3      ---- len of ms param expiry
+        //-[10]: '313030'   100     ---- 100 ms expiry of set value
+
+        //    0 |    1 |      2 |    3 |      4 |    5 |      6 |    7 |    8 |    9 |     10 |
+        //  * 5 |  $ 3 |  S E T |  $ 3 |  f o o |  $ 3 |  b a r |  $ 2 |  P X |  $ 3 |  1 0 0 |
+        // 2A35 | 2433 | 534554 | 2433 | 666F6F | 2433 | 626172 | 2432 | 5058 | 2433 | 313030 |
+        // 
+        string set_key_payload = cmd_payload_hexy_str[4];
+        string set_val_payload = cmd_payload_hexy_str[6];
+
+        WriteLine($"- key_payload: {set_key_payload}");
+        WriteLine($"- val_payload: {set_val_payload}");
+
+        //Dictionary<string, string> resp_keys_dict = new Dictionary<string, string>();
+
+        //resp_keys_dict.Add(set_key_payload, "test_val"); // test val
+        resp_keys_global_dict.TryAdd(set_key_payload, set_val_payload);
+        string get_dict_hexy_val = resp_keys_global_dict[set_key_payload];
+        WriteLine($"- resp_keys_global_dict[{set_key_payload}]: '{get_dict_hexy_val}'");
+
+        if (resp_keys_global_dict?.ContainsKey(set_key_payload) == true)
+        {
+            WriteLine($"gdict[{set_key_payload}]: {resp_keys_global_dict[set_key_payload]}");
+        }
+
+        byte[] return_bytes = UTF8Encoding.UTF8.GetBytes("+OK\r\n");
+
+        //byte[] return_bytes = Convert.FromHexString("0D0A"); // [HEXY_PAYLOAD_STR] ---> [RAW_BYTES]
+        //byte[] return_bytes = Convert.FromHexString(cmd_payload_hexy_str + "0D0A"); // [HEXY_PAYLOAD_STR] ---> [RAW_BYTES]
+        WriteLine("- leaving RunSetCmd() + ret_hexy_bytes('{0}')", Convert.ToHexString(return_bytes));
+        //WriteLine("- leaving RunSetCmd()...");
+        return return_bytes;
+    }
+
     public static byte[] RunGetCmd(byte[] buffer, int b_int)
     {
         WriteLine("- [RunGetCmd()] entered RunGetCmd()");
