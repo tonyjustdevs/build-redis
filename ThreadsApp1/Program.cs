@@ -8,8 +8,8 @@ internal class Program
 {
     static void Main(string[] args)
     {
-        TaskIssues64();
-
+        //TaskIssues64();
+        TaskIssue65();
     }
     public static void TaskIssues64()
     {
@@ -20,6 +20,16 @@ internal class Program
         thread.Join();
         Console.WriteLine($"[Main] Completed TaskIssues64() [{Thread.CurrentThread.ManagedThreadId}]");
     }
+
+    public static void TaskIssue65()    
+    {
+        Console.WriteLine($"[main] started {Thread.CurrentThread.ManagedThreadId}");
+        Thread thread = new Thread(() => Console.WriteLine($"[lamb] sup TaskIssue65! [{Thread.CurrentThread.ManagedThreadId}]"));
+        thread.Start();
+        thread.Join();
+        Console.WriteLine($"[main] completed {Thread.CurrentThread.ManagedThreadId}");
+    }
+
 
     public static void TPSH()
     {
