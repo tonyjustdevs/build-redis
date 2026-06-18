@@ -27,10 +27,8 @@ partial class Program
             //}
 
             #region Print Debug Info
-            
-            PrintReqInUTF8(b_int, buffer); // debug info
+            PrintReqInUTF8(b_int, buffer);
             PrintHexBytes(b_int, buffer);
-            
             #endregion
 
             #region resp validation
@@ -298,7 +296,6 @@ partial class Program
         return return_bytes;
     }
 
-
     public static byte[] RunSetCmd2(byte[] buffer, int b_int)
     {
         WriteLine("- entered RunSetCmd2()");
@@ -342,13 +339,10 @@ partial class Program
         // 
         string set_key_payload = cmd_payload_hexy_str[4];
         string set_val_payload = cmd_payload_hexy_str[6];
-
+         
         WriteLine($"- key_payload: {set_key_payload}");
         WriteLine($"- val_payload: {set_val_payload}");
 
-        //Dictionary<string, string> resp_keys_dict = new Dictionary<string, string>();
-
-        //resp_keys_dict.Add(set_key_payload, "test_val"); // test val
         resp_keys_global_dict.TryAdd(set_key_payload, set_val_payload);
         string get_dict_hexy_val = resp_keys_global_dict[set_key_payload];
         WriteLine($"- resp_keys_global_dict[{set_key_payload}]: '{get_dict_hexy_val}'");
@@ -365,6 +359,10 @@ partial class Program
         WriteLine("- leaving RunSetCmd() + ret_hexy_bytes('{0}')", Convert.ToHexString(return_bytes));
         //WriteLine("- leaving RunSetCmd()...");
         return return_bytes;
+    }
+    public static void ExpireSetCmdKey(byte[] key_hexy)
+    {
+        
     }
 
     public static byte[] RunGetCmd(byte[] buffer, int b_int)

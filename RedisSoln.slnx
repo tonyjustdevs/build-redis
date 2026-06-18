@@ -1,3 +1,5 @@
 <Solution>
+  <Project Path="DelegatesApp1/DelegatesApp1.csproj" Id="89dfef0a-9bdb-47c0-96d5-536c34a7872b" />
+  <Project Path="ThreadsApp1/ThreadsApp1.csproj" Id="700e98bb-ca71-4848-aeda-b5aa21a35725" />
   <Project Path="TPRedis002/TPRedis002.csproj" />
 </Solution>
