@@ -9,7 +9,8 @@ internal class Program
     static void Main(string[] args)
     {
         //TaskIssues64();
-        TaskIssue65();
+        //TaskIssue65();
+        TaskIssue66();
     }
     public static void TaskIssues64()
     {
@@ -30,7 +31,15 @@ internal class Program
         Console.WriteLine($"[main] completed {Thread.CurrentThread.ManagedThreadId}");
     }
 
+    public static void TaskIssue66()
+    {
+        // create task w delegate - no params: https://github.com/tonyjustdevs/build-redis/issues/66
+        Console.WriteLine($"[main] start 66[{Thread.CurrentThread.ManagedThreadId}]");
+        var task = Task.Run(TPSH);
+        task.Wait();
+        Console.WriteLine($"[main] end 66 [{Thread.CurrentThread.ManagedThreadId}]");
 
+    }
     public static void TPSH()
     {
         Console.WriteLine($"[TPSH] sup 69! [{Thread.CurrentThread.ManagedThreadId}]");
