@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Threading.Channels;
 
 namespace ThreadsApp1;
@@ -10,7 +11,12 @@ internal class Program
     {
         //TaskIssues64();
         //TaskIssue65();
-        TaskIssue66();
+        //TaskIssue66();
+        //TaskIssue67();
+        Console.WriteLine("do something 1");
+        await AsyncFakeSaveUser();
+        Console.WriteLine("do something 2");
+        
     }
     public static void TaskIssues64()
     {
@@ -21,7 +27,6 @@ internal class Program
         thread.Join();
         Console.WriteLine($"[Main] Completed TaskIssues64() [{Thread.CurrentThread.ManagedThreadId}]");
     }
-
     public static void TaskIssue65()    
     {
         Console.WriteLine($"[main] started {Thread.CurrentThread.ManagedThreadId}");
@@ -30,7 +35,6 @@ internal class Program
         thread.Join();
         Console.WriteLine($"[main] completed {Thread.CurrentThread.ManagedThreadId}");
     }
-
     public static void TaskIssue66()
     {
         // create task w delegate - no params: https://github.com/tonyjustdevs/build-redis/issues/66
@@ -40,9 +44,26 @@ internal class Program
         Console.WriteLine($"[main] end 66 [{Thread.CurrentThread.ManagedThreadId}]");
 
     }
+
+    public static void TaskIssue67()
+    {
+        Console.WriteLine($"[main] start 67! [{Thread.CurrentThread.ManagedThreadId}]");
+        Task.Run(() =>
+        {
+            TPSH();
+        });
+        Thread.Sleep(2000);
+        Console.WriteLine($"[main] end 67! [{Thread.CurrentThread.ManagedThreadId}]");
+    }
     public static void TPSH()
     {
         Console.WriteLine($"[TPSH] sup 69! [{Thread.CurrentThread.ManagedThreadId}]");
     }
+    
+    public static async Task AsyncFakeSaveUser()
+    {
+        await Task.Delay(3000);
 
+        Console.WriteLine("All Fake Users Saved.");
+    }
 }
