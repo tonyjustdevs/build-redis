@@ -1,3 +1,8 @@
 <Solution>
+  <Project Path="DelegatesApp1/DelegatesApp1.csproj" Id="89dfef0a-9bdb-47c0-96d5-536c34a7872b" />
+  <Project Path="ThreadApp3/ThreadApp3.csproj" Id="24786919-5bbb-43b0-b218-76d20bf889c5" />
+  <Project Path="ThreadsApp1/ThreadsApp1.csproj" Id="700e98bb-ca71-4848-aeda-b5aa21a35725" />
+  <Project Path="ThreadsApp2/ThreadsApp2.csproj" Id="5acd4255-cf58-498d-865a-bac0b26650f9" />
+  <Project Path="ThreadsApp4/ThreadsApp4.csproj" Id="d8c8a693-94de-444a-bf5f-8188534144f0" />
   <Project Path="TPRedis002/TPRedis002.csproj" />
 </Solution>
