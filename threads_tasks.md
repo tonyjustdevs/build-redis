@@ -1,22 +1,21 @@
-# 1. Threads and Tasks
+# Threads and Tasks
 `Threads` are like workers
 `Tasks` are like jobs   
 
+### Level 1: Synchronous Work (the baseline)
+- What: current `thread` is actively calculating something
+- Examples: doing maths, loop through list, sorting data, force pause with `Thread.Sleep()`
+
+### Level 2: Asynchronous I/O Work (`async`/`await`)
+- What: current `thread` asks ***hardware*** to do something
+- Examples: download file, query db, read file from hd, use a timer
+- Important: **Do Not** use `Task.Run` for **I/O** work
+- Code Samples: 
 ```C#
-Task task = Task.Run(() =>
-{
-    Console.WriteLine("Working");
-});
+await Task.Delay(2000);
+await File.ReadAllTextAsync("myFile.txt")
 ```
-Above creates a `Task` object.
-the **run-time** uses the `thread-pool` to execute
 
-# 2. Delegates
-## 2.1 Old-School Delegates
-- Declare **delegate**
-- Create **variable** with delegate as as the type
-- Assign a **method** to this delegate
+### Level 3: CPU-Bound Problem
+What: Heavy work on **Main Thread**
 
-```CS
-
-```
