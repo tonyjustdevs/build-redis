@@ -4,3 +4,4 @@ obj/
 .venv
 tmp/
 zarchive/
+.vscode/
