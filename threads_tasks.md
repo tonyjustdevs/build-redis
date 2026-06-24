@@ -18,4 +18,7 @@ await File.ReadAllTextAsync("myFile.txt")
 
 ### Level 3: CPU-Bound Problem
 What: Heavy work on **Main Thread**
+Problem: `async`/`await` does not help. 
+- Why? What it does for I/O operations is while it is waiting for some response from an external source, like data
+
 
